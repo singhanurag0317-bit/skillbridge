@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import {
     Box, Button, Card, Chip, Container, Grid, Stack,
     Typography, Avatar, LinearProgress, IconButton, Divider, Badge,
@@ -102,12 +103,19 @@ function DashboardNav() {
             </Stack>
 
             <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {["Dashboard", "Explore", "My Skills", "Messages", "Impact"].map((l, i) => (
-                    <Typography key={l} sx={{
+                {[
+                    { label: "Dashboard", href: "/dashboard" },
+                    { label: "Explore", href: "/explore" },
+                    { label: "My Skills", href: "/dashboard" },
+                    { label: "Messages", href: "/chat" },
+                    { label: "Impact", href: "/impact" },
+                ].map((l, i) => (
+                    <Typography key={l.label} component={Link} href={l.href} sx={{
                         color: i === 0 ? C.emerald : C.muted, fontSize: 14, cursor: "pointer",
                         borderBottom: i === 0 ? `2px solid ${C.emerald}` : "2px solid transparent",
                         pb: 0.3, "&:hover": { color: C.text }, transition: "color 0.2s",
-                    }}>{l}</Typography>
+                        textDecoration: "none",
+                    }}>{l.label}</Typography>
                 ))}
             </Stack>
 
@@ -158,7 +166,7 @@ function WelcomeHeader() {
                     <Button size="small" startIcon={<Add />} sx={{ borderColor: `${C.emerald}55`, color: C.emerald, border: "1px solid", textTransform: "none", borderRadius: "10px", fontSize: 13, "&:hover": { background: `${C.emerald}10` } }}>
                         Add skill
                     </Button>
-                    <Button variant="contained" size="small" endIcon={<ArrowForward />} sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", textTransform: "none", borderRadius: "10px", fontSize: 13, boxShadow: "none" }}>
+                    <Button component={Link} href="/explore" variant="contained" size="small" endIcon={<ArrowForward />} sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", textTransform: "none", borderRadius: "10px", fontSize: 13, boxShadow: "none" }}>
                         Explore matches
                     </Button>
                 </Stack>

@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 import {
     Box, Button, Card, Chip, Container, Stack,
     Typography, Avatar, IconButton, Divider, Badge,
@@ -127,8 +128,14 @@ function Navbar() {
                 <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 17, color: C.text }}>SkillBridge</Typography>
             </Stack>
             <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {["Dashboard", "Explore", "My Skills", "Messages", "Impact"].map((l, i) => (
-                    <Typography key={l} sx={{ color: i === 3 ? C.emerald : C.muted, fontSize: 14, cursor: "pointer", borderBottom: i === 3 ? `2px solid ${C.emerald}` : "2px solid transparent", pb: 0.3, "&:hover": { color: C.text }, transition: "color 0.2s" }}>{l}</Typography>
+                {[
+                    { label: "Dashboard", href: "/dashboard" },
+                    { label: "Explore", href: "/explore" },
+                    { label: "My Skills", href: "/dashboard" },
+                    { label: "Messages", href: "/chat" },
+                    { label: "Impact", href: "/impact" },
+                ].map((l, i) => (
+                    <Typography key={l.label} component={Link} href={l.href} sx={{ color: i === 3 ? C.emerald : C.muted, fontSize: 14, cursor: "pointer", borderBottom: i === 3 ? `2px solid ${C.emerald}` : "2px solid transparent", pb: 0.3, "&:hover": { color: C.text }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
                 ))}
             </Stack>
             <Avatar sx={{ width: 32, height: 32, background: `linear-gradient(135deg,${C.emerald},${C.coral})`, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>AS</Avatar>

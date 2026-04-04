@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import {
     Box, Button, Card, Chip, Container, Grid, Stack,
     Typography, Avatar, LinearProgress, IconButton, Divider, Tab, Tabs,
@@ -96,13 +97,19 @@ function Navbar() {
                 </Typography>
             </Stack>
             <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {["Dashboard", "Explore", "My Skills", "Messages", "Impact"].map((l, i) => (
-                    <Typography key={l} sx={{ color: C.muted, fontSize: 14, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s" }}>{l}</Typography>
+                {[
+                    { label: "Dashboard", href: "/dashboard" },
+                    { label: "Explore", href: "/explore" },
+                    { label: "My Skills", href: "/dashboard" },
+                    { label: "Messages", href: "/chat" },
+                    { label: "Impact", href: "/impact" },
+                ].map(l => (
+                    <Typography key={l.label} component={Link} href={l.href} sx={{ color: C.muted, fontSize: 14, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
                 ))}
             </Stack>
             <Stack direction="row" spacing={1.5}>
-                <Button variant="text" sx={{ color: C.muted, fontSize: 13, textTransform: "none" }}>Sign in</Button>
-                <Button variant="contained" sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontSize: 13, textTransform: "none", borderRadius: "10px", px: 2.5, boxShadow: "none" }}>
+                <Button component={Link} href="/auth/login" variant="text" sx={{ color: C.muted, fontSize: 13, textTransform: "none" }}>Sign in</Button>
+                <Button component={Link} href="/auth/login" variant="contained" sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontSize: 13, textTransform: "none", borderRadius: "10px", px: 2.5, boxShadow: "none" }}>
                     Join free
                 </Button>
             </Stack>
@@ -422,7 +429,7 @@ function ReviewsTab() {
                         </Stack>
                         <FormatQuote sx={{ fontSize: 20, color: r.color, opacity: 0.6, mb: 0.5 }} />
                         <Typography sx={{ color: "rgba(240,237,232,0.7)", fontSize: 14, lineHeight: 1.8, fontStyle: "italic" }}>
-                            "{r.comment}"
+                            &ldquo;{r.comment}&rdquo;
                         </Typography>
                     </Card>
                 ))}

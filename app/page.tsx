@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import {
   Box, Button, Card, CardContent, Chip, Container,
   Grid, Stack, Typography, Avatar,
@@ -25,7 +26,12 @@ const C = {
 };
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
-const NAV_LINKS = ["How it works", "Explore skills", "Impact", "Community"];
+const NAV_LINKS = [
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "Explore skills", href: "/explore" },
+  { label: "Impact", href: "/impact" },
+  { label: "Community", href: "/dashboard" },
+];
 
 const STATS = [
   { value: "12,400+", label: "Skills shared" },
@@ -108,13 +114,13 @@ function Navbar() {
 
       <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
         {NAV_LINKS.map(l => (
-          <Typography key={l} sx={{ color: C.muted, fontSize: 14, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s" }}>{l}</Typography>
+          <Typography key={l.label} component={Link} href={l.href} sx={{ color: C.muted, fontSize: 14, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
         ))}
       </Stack>
 
       <Stack direction="row" spacing={1.5}>
-        <Button variant="text" sx={{ color: C.muted, fontSize: 13, textTransform: "none", "&:hover": { color: C.text } }}>Sign in</Button>
-        <Button variant="contained" sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontSize: 13, textTransform: "none", borderRadius: "10px", px: 2.5, fontWeight: 600, boxShadow: "none", "&:hover": { boxShadow: `0 4px 20px ${C.emerald}55` } }}>
+        <Button component={Link} href="/auth/login" variant="text" sx={{ color: C.muted, fontSize: 13, textTransform: "none", "&:hover": { color: C.text } }}>Sign in</Button>
+        <Button component={Link} href="/auth/login" variant="contained" sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontSize: 13, textTransform: "none", borderRadius: "10px", px: 2.5, fontWeight: 600, boxShadow: "none", "&:hover": { boxShadow: `0 4px 20px ${C.emerald}55` } }}>
           Join free
         </Button>
       </Stack>
@@ -151,12 +157,12 @@ function Hero() {
             </Typography>
 
             <Stack direction={{ xs: "column", sm: "row" }} spacing={2} mb={5}>
-              <Button variant="contained" size="large" endIcon={<ArrowForward />} sx={{
+              <Button component={Link} href="/auth/login" variant="contained" size="large" endIcon={<ArrowForward />} sx={{
                 background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff",
                 fontSize: 16, textTransform: "none", borderRadius: "12px", px: 4, py: 1.6, fontWeight: 700, boxShadow: "none",
                 "&:hover": { boxShadow: `0 6px 28px ${C.emerald}55`, transform: "translateY(-1px)" }, transition: "all 0.2s",
               }}>Start sharing skills</Button>
-              <Button variant="outlined" size="large" sx={{
+              <Button component={Link} href="/explore" variant="outlined" size="large" sx={{
                 borderColor: C.border, color: C.text, fontSize: 16, textTransform: "none", borderRadius: "12px", px: 4, py: 1.6,
                 "&:hover": { borderColor: C.emerald, background: `${C.emerald}10` },
               }}>Browse skills nearby</Button>
@@ -349,7 +355,7 @@ function SkillsShowcase() {
           ))}
         </Grid>
         <Box sx={{ textAlign: "center", mt: 5 }}>
-          <Button variant="outlined" size="large" endIcon={<ArrowForward />} sx={{
+          <Button component={Link} href="/explore" variant="outlined" size="large" endIcon={<ArrowForward />} sx={{
             borderColor: C.border, color: C.text, textTransform: "none", borderRadius: "12px", px: 4, py: 1.4, fontSize: 15,
             "&:hover": { borderColor: C.emerald, background: `${C.emerald}10` },
           }}>Explore all skills</Button>
@@ -377,7 +383,7 @@ function Testimonials() {
               <Box sx={{ opacity: visible ? 1 : 0, transform: visible ? "translateY(0)" : "translateY(24px)", transition: `all 0.55s ease ${i * 0.12}s`, height: "100%" }}>
                 <Card sx={{ background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`, borderRadius: "20px", p: 3.5, height: "100%", "&:hover": { borderColor: t.color + "44" }, transition: "border 0.3s" }}>
                   <FormatQuote sx={{ fontSize: 32, color: t.color, mb: 1.5, opacity: 0.8 }} />
-                  <Typography sx={{ color: "rgba(240,237,232,0.72)", fontSize: 15, lineHeight: 1.8, mb: 3, fontStyle: "italic" }}>"{t.quote}"</Typography>
+                  <Typography sx={{ color: "rgba(240,237,232,0.72)", fontSize: 15, lineHeight: 1.8, mb: 3, fontStyle: "italic" }}>&ldquo;{t.quote}&rdquo;</Typography>
                   <Stack direction="row" alignItems="center" spacing={1.5}>
                     <Avatar sx={{ width: 40, height: 40, background: t.color, fontSize: 14, fontWeight: 700 }}>{t.initials}</Avatar>
                     <Box>
@@ -419,12 +425,12 @@ function CTA() {
             Join thousands of people who are already building richer, more connected communities — one shared skill at a time.
           </Typography>
           <Stack direction={{ xs: "column", sm: "row" }} spacing={2} justifyContent="center">
-            <Button variant="contained" size="large" endIcon={<ArrowForward />} sx={{
+            <Button component={Link} href="/auth/login" variant="contained" size="large" endIcon={<ArrowForward />} sx={{
               background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff",
               fontSize: 16, textTransform: "none", borderRadius: "14px", px: 5, py: 1.8, fontWeight: 700, boxShadow: "none",
               "&:hover": { boxShadow: `0 8px 32px ${C.emerald}55`, transform: "translateY(-2px)" }, transition: "all 0.2s",
-            }}>Get started — it's free</Button>
-            <Button variant="outlined" size="large" sx={{
+            }}>Get started — it&apos;s free</Button>
+            <Button component={Link} href="/#how-it-works" variant="outlined" size="large" sx={{
               borderColor: C.border, color: C.text, fontSize: 16, textTransform: "none", borderRadius: "14px", px: 5, py: 1.8,
               "&:hover": { borderColor: C.coral, background: `${C.coral}10` },
             }}>See how it works</Button>

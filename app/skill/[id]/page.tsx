@@ -1,5 +1,6 @@
 "use client";
 import React, { useState } from "react";
+import Link from "next/link";
 import {
     Box, Button, Card, Chip, Container, Grid, Stack,
     Typography, Avatar, LinearProgress, Divider,
@@ -107,13 +108,19 @@ function Navbar() {
                 <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 18, color: C.text }}>SkillBridge</Typography>
             </Stack>
             <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {["Dashboard", "Explore", "My Skills", "Messages", "Impact"].map(l => (
-                    <Typography key={l} sx={{ color: C.muted, fontSize: 14, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s" }}>{l}</Typography>
+                {[
+                    { label: "Dashboard", href: "/dashboard" },
+                    { label: "Explore", href: "/explore" },
+                    { label: "My Skills", href: "/dashboard" },
+                    { label: "Messages", href: "/chat" },
+                    { label: "Impact", href: "/impact" },
+                ].map(l => (
+                    <Typography key={l.label} component={Link} href={l.href} sx={{ color: C.muted, fontSize: 14, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
                 ))}
             </Stack>
             <Stack direction="row" spacing={1.5}>
-                <Button variant="text" sx={{ color: C.muted, fontSize: 13, textTransform: "none" }}>Sign in</Button>
-                <Button sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontSize: 13, textTransform: "none", borderRadius: "10px", px: 2.5, boxShadow: "none" }}>Join free</Button>
+                <Button component={Link} href="/auth/login" variant="text" sx={{ color: C.muted, fontSize: 13, textTransform: "none" }}>Sign in</Button>
+                <Button component={Link} href="/auth/login" sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontSize: 13, textTransform: "none", borderRadius: "10px", px: 2.5, boxShadow: "none" }}>Join free</Button>
             </Stack>
         </Box>
     );
@@ -123,7 +130,7 @@ function Navbar() {
 function Breadcrumb() {
     return (
         <Stack direction="row" alignItems="center" spacing={1} mb={3}>
-            <Button startIcon={<ArrowBack sx={{ fontSize: 14 }} />} sx={{ color: C.muted, textTransform: "none", fontSize: 13, p: 0, minWidth: 0, "&:hover": { color: C.emerald, background: "none" } }}>
+            <Button component={Link} href="/explore" startIcon={<ArrowBack sx={{ fontSize: 14 }} />} sx={{ color: C.muted, textTransform: "none", fontSize: 13, p: 0, minWidth: 0, "&:hover": { color: C.emerald, background: "none" } }}>
                 Explore
             </Button>
             <Typography sx={{ color: C.faint, fontSize: 13 }}>/</Typography>
@@ -351,7 +358,7 @@ function ReviewsSection() {
                         </Stack>
                         <FormatQuote sx={{ fontSize: 18, color: r.color, opacity: 0.6 }} />
                         <Typography sx={{ color: "rgba(240,237,232,0.68)", fontSize: 14, lineHeight: 1.8, fontStyle: "italic" }}>
-                            "{r.comment}"
+                            &ldquo;{r.comment}&rdquo;
                         </Typography>
                     </Box>
                 ))}
@@ -412,7 +419,7 @@ function Sidebar() {
                 }}>
                     {selectedSlot ? `Request — ${selectedSlot}` : "Request a session"}
                 </Button>
-                <Button fullWidth variant="outlined" sx={{
+                <Button component={Link} href="/chat" fullWidth variant="outlined" sx={{
                     borderColor: C.border, color: C.muted, textTransform: "none",
                     borderRadius: "12px", py: 1.2, fontSize: 14,
                     "&:hover": { borderColor: C.emerald, color: C.emerald },
@@ -475,7 +482,7 @@ function Sidebar() {
                     <Typography sx={{ fontSize: 12, color: C.emerald, fontWeight: 600 }}>{PROVIDER.responseTime}</Typography>
                 </Stack>
 
-                <Button fullWidth variant="outlined" endIcon={<ArrowForward sx={{ fontSize: 14 }} />} sx={{
+                <Button component={Link} href="/profile/1" fullWidth variant="outlined" endIcon={<ArrowForward sx={{ fontSize: 14 }} />} sx={{
                     borderColor: `${C.emerald}33`, color: C.emerald, textTransform: "none",
                     borderRadius: "10px", fontSize: 13,
                     "&:hover": { borderColor: C.emerald, background: `${C.emerald}08` },
