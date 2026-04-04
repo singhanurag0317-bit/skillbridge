@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ThemeRegistry from "@/theme/ThemeRegistry";
+import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata: Metadata = {
   title: "SkillBridge — Share a skill, change a life",
@@ -17,7 +18,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <ThemeRegistry>
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
         </ThemeRegistry>
       </body>
     </html>
