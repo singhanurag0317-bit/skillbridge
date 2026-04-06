@@ -453,11 +453,11 @@ function Footer() {
             </Box>
             <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, color: C.text, fontSize: 16 }}>SkillBridge</Typography>
           </Stack>
-          <Typography sx={{ color: C.faint, fontSize: 13 }}>Built for Google Hackathon 2025 · Smart Resource Allocation</Typography>
-          <Stack direction="row" spacing={3}>
-            {["Privacy", "Terms", "Contact"].map(l => (
-              <Typography key={l} sx={{ color: C.faint, fontSize: 13, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s" }}>{l}</Typography>
-            ))}
+          <Typography sx={{ color: C.faint, fontSize: 13 }}>&copy; 2026 SkillBridge. All rights reserved.</Typography>
+          <Stack direction={{ xs: "column", md: "row" }} alignItems="center" spacing={3}>
+            <Typography component={Link} href="/privacy" sx={{ color: C.faint, fontSize: 13, textDecoration: "none", "&:hover": { color: C.emerald }, transition: "color 0.2s" }}>Privacy Policy</Typography>
+            <Typography component={Link} href="/terms" sx={{ color: C.faint, fontSize: 13, textDecoration: "none", "&:hover": { color: C.emerald }, transition: "color 0.2s" }}>Terms of Service</Typography>
+            <Typography sx={{ color: C.faint, fontSize: 13, textDecoration: "none", "& a": { color: "inherit", textDecoration: "none", transition: "color 0.2s" }, "& a:hover": { color: C.emerald } }}>Contact: <a href="mailto:hello@skillbridge.com">hello@skillbridge.com</a></Typography>
           </Stack>
         </Stack>
       </Container>

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import ThemeRegistry from "@/theme/ThemeRegistry";
 import { AuthProvider } from "@/context/AuthContext";
+import { ToastProvider } from "@/context/ToastContext";
+import CommandPaletteWrapper from "@/components/ui/CommandPaletteWrapper";
 
 export const metadata: Metadata = {
   title: "SkillBridge — Share a skill, change a life",
@@ -19,7 +21,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <ThemeRegistry>
           <AuthProvider>
-            {children}
+            <ToastProvider>
+              {children}
+              <CommandPaletteWrapper />
+            </ToastProvider>
           </AuthProvider>
         </ThemeRegistry>
       </body>

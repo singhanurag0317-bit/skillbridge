@@ -6,12 +6,14 @@
 // Uses useAuth to show user avatar or Sign in button.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Box, Button, Stack, Typography, Avatar, IconButton, Badge } from "@mui/material";
-import { Handshake, Notifications, Settings } from "@mui/icons-material";
+import { Handshake, Notifications, Settings, Menu as MenuIcon } from "@mui/icons-material";
 import { useAuth } from "@/context/AuthContext";
+import MobileNavDrawer from "@/components/ui/MobileNavDrawer";
+import NotificationsDrawer from "@/components/ui/NotificationsDrawer";
 
 const NAV_LINKS = [
     { label: "Dashboard", href: "/dashboard" },
@@ -33,6 +35,8 @@ const C = {
 export default function Navbar() {
     const pathname = usePathname();
     const { user, isAuthenticated } = useAuth();
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [notifsOpen, setNotifsOpen] = useState(false);
 
     const isActive = (href: string) => pathname === href || pathname.startsWith(href + "/");
 
@@ -44,18 +48,26 @@ export default function Navbar() {
             background: "rgba(8,15,30,0.95)", backdropFilter: "blur(16px)",
             position: "sticky", top: 0, zIndex: 100,
         }}>
+            <MobileNavDrawer open={mobileOpen} onClose={() => setMobileOpen(false)} activeHref={pathname} />
+            <NotificationsDrawer open={notifsOpen} onClose={() => setNotifsOpen(false)} />
+
             {/* Logo */}
-            <Stack direction="row" alignItems="center" spacing={1} component={Link} href="/" sx={{ textDecoration: "none" }}>
-                <Box sx={{
-                    width: 32, height: 32, borderRadius: "9px",
-                    background: `linear-gradient(135deg,${C.emerald},${C.coral})`,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                }}>
-                    <Handshake sx={{ fontSize: 16, color: "#fff" }} />
-                </Box>
-                <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 18, color: C.text }}>
-                    SkillBridge
-                </Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+                <IconButton onClick={() => setMobileOpen(true)} sx={{ color: C.muted, display: { md: "none" } }}>
+                    <MenuIcon />
+                </IconButton>
+                <Stack direction="row" alignItems="center" spacing={1} component={Link} href="/" sx={{ textDecoration: "none" }}>
+                    <Box sx={{
+                        width: 32, height: 32, borderRadius: "9px",
+                        background: `linear-gradient(135deg,${C.emerald},${C.coral})`,
+                        display: "flex", alignItems: "center", justifyContent: "center",
+                    }}>
+                        <Handshake sx={{ fontSize: 16, color: "#fff" }} />
+                    </Box>
+                    <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 18, color: C.text }}>
+                        SkillBridge
+                    </Typography>
+                </Stack>
             </Stack>
 
             {/* Nav links */}
@@ -87,12 +99,12 @@ export default function Navbar() {
             {/* Right side */}
             {isAuthenticated && user ? (
                 <Stack direction="row" alignItems="center" spacing={1.5}>
-                    <IconButton sx={{ color: C.muted, "&:hover": { color: C.text } }}>
+                    <IconButton onClick={() => setNotifsOpen(true)} sx={{ color: C.muted, "&:hover": { color: C.text } }}>
                         <Badge badgeContent={2} sx={{ "& .MuiBadge-badge": { background: C.coral, color: "#fff" } }}>
                             <Notifications sx={{ fontSize: 20 }} />
                         </Badge>
                     </IconButton>
-                    <IconButton sx={{ color: C.muted, "&:hover": { color: C.text } }}>
+                    <IconButton component={Link} href="/settings" sx={{ color: C.muted, "&:hover": { color: C.text } }}>
                         <Settings sx={{ fontSize: 20 }} />
                     </IconButton>
                     <Avatar

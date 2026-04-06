@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import BookingConfirmDialog from "@/components/ui/BookingConfirmDialog";
 import {
     Box, Button, Card, Chip, Container, Grid, Stack,
     Typography, Avatar, LinearProgress, Divider,
@@ -153,7 +154,7 @@ function SkillHero() {
             <Box sx={{ position: "absolute", bottom: -40, left: "30%", width: 160, height: 160, borderRadius: "50%", background: `radial-gradient(circle,${C.emerald}10,transparent 70%)`, pointerEvents: "none" }} />
 
             <Grid container spacing={3} alignItems="center">
-                <Grid item xs={12} md={8}>
+                <Grid size={{ xs: 12, md: 8 }}>
                     <Stack direction="row" alignItems="center" spacing={1.5} mb={2}>
                         <Box sx={{ width: 52, height: 52, borderRadius: "14px", background: `${C.emerald}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                             <Psychology sx={{ fontSize: 26, color: C.emerald }} />
@@ -196,7 +197,7 @@ function SkillHero() {
                 </Grid>
 
                 {/* Right: quick info */}
-                <Grid item xs={12} md={4}>
+                <Grid size={{ xs: 12, md: 4 }}>
                     <Stack spacing={1.5}>
                         {[
                             { icon: <WorkspacePremium sx={{ fontSize: 16, color: C.gold }} />, label: "Completely free" },
@@ -370,6 +371,7 @@ function ReviewsSection() {
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 function Sidebar() {
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
+    const [bookingOpen, setBookingOpen] = useState(false);
     const availableSlots = AVAILABILITY.filter(d => d.available).flatMap(d => d.slots.map(s => `${d.day} ${s}`));
 
     return (
@@ -410,14 +412,15 @@ function Sidebar() {
                     ))}
                 </Stack>
 
-                <Button fullWidth variant="contained" endIcon={<ArrowForward />} sx={{
+                <Button fullWidth variant="contained" onClick={() => setBookingOpen(true)} disabled={!selectedSlot} endIcon={<ArrowForward />} sx={{
                     background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff",
                     textTransform: "none", borderRadius: "12px", py: 1.5, fontSize: 15, fontWeight: 700,
                     boxShadow: "none", mb: 1.5,
                     "&:hover": { boxShadow: `0 6px 24px ${C.emerald}44`, transform: "translateY(-1px)" },
                     transition: "all 0.2s",
+                    "&.Mui-disabled": { background: C.border, color: C.muted }
                 }}>
-                    {selectedSlot ? `Request — ${selectedSlot}` : "Request a session"}
+                    {selectedSlot ? `Request — ${selectedSlot}` : "Pick a time slot first"}
                 </Button>
                 <Button component={Link} href="/chat" fullWidth variant="outlined" sx={{
                     borderColor: C.border, color: C.muted, textTransform: "none",
@@ -500,6 +503,15 @@ function Sidebar() {
                     Save
                 </Button>
             </Stack>
+
+            <BookingConfirmDialog
+                open={bookingOpen}
+                onClose={() => setBookingOpen(false)}
+                skillTitle={SKILL.title}
+                providerName={PROVIDER.name}
+                providerInitials={PROVIDER.initials}
+                selectedSlot={selectedSlot || ""}
+            />
         </Stack>
     );
 }
@@ -513,7 +525,7 @@ function SimilarSkills() {
             </Typography>
             <Grid container spacing={2.5}>
                 {SIMILAR_SKILLS.map((s, i) => (
-                    <Grid item xs={12} sm={4} key={s.title}>
+                    <Grid size={{ xs: 12, sm: 4 }} key={s.title}>
                         <Card sx={{
                             background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`, borderRadius: "18px", p: 2.5, cursor: "pointer",
                             animation: `fadeUp 0.45s ease ${i * 0.1}s both`,
@@ -550,10 +562,10 @@ export default function SkillDetailPage() {
                 <Breadcrumb />
                 <SkillHero />
                 <Grid container spacing={4}>
-                    <Grid item xs={12} md={7}>
+                    <Grid size={{ xs: 12, md: 7 }}>
                         <SkillContent />
                     </Grid>
-                    <Grid item xs={12} md={5}>
+                    <Grid size={{ xs: 12, md: 5 }}>
                         <Sidebar />
                     </Grid>
                 </Grid>

@@ -1,6 +1,10 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import MobileNavDrawer from "@/components/ui/MobileNavDrawer";
+import NotificationsDrawer from "@/components/ui/NotificationsDrawer";
+import AddSkillModal from "@/components/forms/AddSkillModal";
+import { useToast } from "@/context/ToastContext";
 import {
     Box, Button, Card, Chip, Container, Grid, Stack,
     Typography, Avatar, LinearProgress, IconButton, Divider, Badge,
@@ -9,7 +13,7 @@ import {
     Add, Edit, Delete, CheckCircle, Cancel, Schedule,
     LocationOn, Star, TrendingUp, People, AccessTime,
     EmojiEvents, Notifications, Settings, ArrowForward,
-    FiberManualRecord, Psychology, Handshake,
+    FiberManualRecord, Psychology, Handshake, Menu as MenuIcon,
 } from "@mui/icons-material";
 
 // ─── Color tokens ─────────────────────────────────────────────────────────────
@@ -86,7 +90,7 @@ const ACTIVITY_COLORS: Record<string, string> = {
 };
 
 // ─── Navbar ───────────────────────────────────────────────────────────────────
-function DashboardNav() {
+function DashboardNav({ setMobileOpen, setNotifsOpen, setAddSkillOpen }: any) {
     return (
         <Box sx={{
             px: { xs: 2, md: 4 }, py: 1.5,
@@ -96,6 +100,7 @@ function DashboardNav() {
             position: "sticky", top: 0, zIndex: 100,
         }}>
             <Stack direction="row" alignItems="center" spacing={1}>
+                <IconButton onClick={() => setMobileOpen(true)} sx={{ color: C.muted, display: { md: "none" } }}><MenuIcon /></IconButton>
                 <Box sx={{ width: 32, height: 32, borderRadius: "9px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                     <Handshake sx={{ fontSize: 16, color: "#fff" }} />
                 </Box>
@@ -120,15 +125,15 @@ function DashboardNav() {
             </Stack>
 
             <Stack direction="row" alignItems="center" spacing={1.5}>
-                <IconButton sx={{ color: C.muted, "&:hover": { color: C.text } }}>
+                <IconButton onClick={() => setNotifsOpen(true)} sx={{ color: C.muted, "&:hover": { color: C.text } }}>
                     <Badge badgeContent={2} sx={{ "& .MuiBadge-badge": { background: C.coral, color: "#fff" } }}>
                         <Notifications sx={{ fontSize: 20 }} />
                     </Badge>
                 </IconButton>
-                <IconButton sx={{ color: C.muted, "&:hover": { color: C.text } }}>
+                <IconButton component={Link} href="/settings" sx={{ color: C.muted, "&:hover": { color: C.text } }}>
                     <Settings sx={{ fontSize: 20 }} />
                 </IconButton>
-                <Avatar sx={{ width: 34, height: 34, background: `linear-gradient(135deg,${C.emerald},${C.coral})`, fontSize: 13, fontWeight: 700, cursor: "pointer" }}>
+                <Avatar component={Link} href="/profile/1" sx={{ width: 34, height: 34, background: `linear-gradient(135deg,${C.emerald},${C.coral})`, fontSize: 13, fontWeight: 700, cursor: "pointer", textDecoration: "none" }}>
                     {USER.initials}
                 </Avatar>
             </Stack>
@@ -137,7 +142,7 @@ function DashboardNav() {
 }
 
 // ─── Welcome Header ───────────────────────────────────────────────────────────
-function WelcomeHeader() {
+function WelcomeHeader({ setAddSkillOpen }: any) {
     return (
         <Box sx={{
             background: `linear-gradient(135deg,${C.emerald}0D,${C.coral}0D)`,
@@ -163,7 +168,7 @@ function WelcomeHeader() {
                     </Box>
                 </Stack>
                 <Stack direction="row" spacing={1.5}>
-                    <Button size="small" startIcon={<Add />} sx={{ borderColor: `${C.emerald}55`, color: C.emerald, border: "1px solid", textTransform: "none", borderRadius: "10px", fontSize: 13, "&:hover": { background: `${C.emerald}10` } }}>
+                    <Button size="small" startIcon={<Add />} onClick={() => setAddSkillOpen(true)} sx={{ borderColor: `${C.emerald}55`, color: C.emerald, border: "1px solid", textTransform: "none", borderRadius: "10px", fontSize: 13, "&:hover": { background: `${C.emerald}10` } }}>
                         Add skill
                     </Button>
                     <Button component={Link} href="/explore" variant="contained" size="small" endIcon={<ArrowForward />} sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", textTransform: "none", borderRadius: "10px", fontSize: 13, boxShadow: "none" }}>
@@ -193,7 +198,7 @@ function StatsRow() {
     return (
         <Grid container spacing={2} sx={{ mb: 3 }}>
             {STATS.map((s, i) => (
-                <Grid item xs={6} md={3} key={s.label}>
+                <Grid size={{ xs: 6, md: 3 }} key={s.label}>
                     <Card sx={{
                         background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`, borderRadius: "16px", p: 2.5,
                         animation: `fadeUp 0.5s ease ${i * 0.08}s both`,
@@ -335,7 +340,7 @@ function RecommendedMatches() {
             </Stack>
             <Grid container spacing={2}>
                 {RECOMMENDED.map(r => (
-                    <Grid item xs={12} sm={4} key={r.id}>
+                    <Grid size={{ xs: 12, sm: 4 }} key={r.id}>
                         <Box sx={{
                             p: 2, borderRadius: "14px", background: "rgba(240,237,232,0.02)", border: `1px solid ${C.border}`, cursor: "pointer",
                             "&:hover": { borderColor: r.color + "55", background: r.color + "08", transform: "translateY(-2px)" }, transition: "all 0.2s",
@@ -398,15 +403,22 @@ function RecentActivity() {
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
+    const [mobileOpen, setMobileOpen] = useState(false);
+    const [notifsOpen, setNotifsOpen] = useState(false);
+    const [addSkillOpen, setAddSkillOpen] = useState(false);
+
     return (
         <Box sx={{ background: C.ink, minHeight: "100vh", color: C.text }}>
-            <DashboardNav />
+            <MobileNavDrawer open={mobileOpen} onClose={() => setMobileOpen(false)} activeHref="/dashboard" />
+            <NotificationsDrawer open={notifsOpen} onClose={() => setNotifsOpen(false)} />
+            <AddSkillModal open={addSkillOpen} onClose={() => setAddSkillOpen(false)} />
+            <DashboardNav setMobileOpen={setMobileOpen} setNotifsOpen={setNotifsOpen} setAddSkillOpen={setAddSkillOpen} />
             <Container maxWidth="xl" sx={{ py: 4 }}>
-                <WelcomeHeader />
+                <WelcomeHeader setAddSkillOpen={setAddSkillOpen} />
                 <StatsRow />
                 <Grid container spacing={3} sx={{ mb: 3 }}>
-                    <Grid item xs={12} md={5}><MySkills /></Grid>
-                    <Grid item xs={12} md={7}><Requests /></Grid>
+                    <Grid size={{ xs: 12, md: 5 }}><MySkills /></Grid>
+                    <Grid size={{ xs: 12, md: 7 }}><Requests /></Grid>
                 </Grid>
                 <Box sx={{ mb: 3 }}><RecommendedMatches /></Box>
                 <RecentActivity />
@@ -414,3 +426,4 @@ export default function DashboardPage() {
         </Box>
     );
 }
+
