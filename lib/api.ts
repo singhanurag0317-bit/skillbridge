@@ -20,14 +20,14 @@ const api = axios.create({
 });
 
 // ─── Auth token injection ─────────────────────────────────────────────────────
-api.interceptors.request.use(async (config) => {
-    try {
-        // Uncomment once Firebase is connected:
-        // const { auth } = await import("@/lib/firebase");
-        // const token = await auth.currentUser?.getIdToken();
-        // if (token) config.headers.Authorization = `Bearer ${token}`;
-    } catch (e) {
-        console.error("Token error:", e);
+// Reads the JWT stored by AuthContext (sb_token) and attaches it to every request.
+api.interceptors.request.use((config) => {
+    if (typeof window !== "undefined") {
+        const token = localStorage.getItem("sb_token");
+        if (token) {
+            config.headers = config.headers ?? {};
+            config.headers.Authorization = `Bearer ${token}`;
+        }
     }
     return config;
 });
