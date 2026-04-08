@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/context/AuthContext";
 import {
     Box, Button, Card, Chip, Divider, IconButton,
     InputAdornment, Stack, TextField, Typography, Avatar,
@@ -125,30 +126,30 @@ function LeftPanel() {
 // ─── Login Form ───────────────────────────────────────────────────────────────
 function LoginForm({ onSwitch }: { onSwitch: () => void }) {
     const router = useRouter();
+    const { login } = useAuth();
     const [showPass, setShowPass] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const handleLogin = async () => {
         if (!email || !password) return;
         setLoading(true);
-        // TODO: replace with real Firebase auth
-        // await signInWithEmailAndPassword(auth, email, password);
-        setTimeout(() => {
-            setLoading(false);
+        setError("");
+        try {
+            await login(email, password);
             router.push("/dashboard");
-        }, 1000);
+        } catch (e: any) {
+            setError(e?.message ?? "Login failed. Please check your credentials.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleGoogle = async () => {
-        setLoading(true);
-        // TODO: replace with real Firebase Google auth
-        // await signInWithPopup(auth, googleProvider);
-        setTimeout(() => {
-            setLoading(false);
-            router.push("/dashboard");
-        }, 1000);
+        // Google auth not yet implemented
+        setError("Google sign-in is not yet available.");
     };
 
     return (
@@ -200,8 +201,12 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
                 "&:hover": { boxShadow: `0 6px 24px ${C.emerald}44`, transform: "translateY(-1px)" },
                 transition: "all 0.2s",
             }}>
-                {loading ? "Signing in…" : "Sign in"}
+            {loading ? "Signing in…" : "Sign in"}
             </Button>
+
+            {error && (
+                <Typography sx={{ color: "#F43A3A", fontSize: 13, textAlign: "center", mt: -1, mb: 1 }}>{error}</Typography>
+            )}
 
             <Typography sx={{ textAlign: "center", color: C.muted, fontSize: 14 }}>
                 Don&apos;t have an account?{" "}
@@ -214,34 +219,37 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
 // ─── Register Form ────────────────────────────────────────────────────────────
 function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
     const router = useRouter();
+    const { register } = useAuth();
     const [step, setStep] = useState(1);
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
     const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
     const [form, setForm] = useState({ name: "", email: "", password: "", location: "", bio: "" });
 
     const update = (k: string, v: string) => setForm(f => ({ ...f, [k]: v }));
     const toggleSkill = (s: string) => setSelectedSkills(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
 
-    // ✅ After register → go to onboarding (not dashboard)
     const handleFinish = async () => {
         setLoading(true);
-        // TODO: replace with real Firebase register
-        // await createUserWithEmailAndPassword(auth, form.email, form.password);
-        // await updateProfile(auth.currentUser, { displayName: form.name });
-        setTimeout(() => {
+        setError("");
+        try {
+            await register({
+                name: form.name,
+                email: form.email,
+                password: form.password,
+                location: form.location,
+            });
+            router.push("/onboarding");
+        } catch (e: any) {
+            setError(e?.message ?? "Registration failed. Please try again.");
+        } finally {
             setLoading(false);
-            router.push("/onboarding"); // ← KEY CHANGE
-        }, 1200);
+        }
     };
 
     const handleGoogle = async () => {
-        setLoading(true);
-        // TODO: replace with real Firebase Google auth
-        setTimeout(() => {
-            setLoading(false);
-            router.push("/onboarding"); // ← new users via Google also go to onboarding
-        }, 1000);
+        setError("Google sign-up is not yet available.");
     };
 
     const steps = ["Account", "Profile", "Skills"];
@@ -398,6 +406,9 @@ function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
                     <Typography sx={{ textAlign: "center", color: C.faint, fontSize: 12, mt: 2 }}>
                         By joining you agree to our Terms of Service and Privacy Policy
                     </Typography>
+                    {error && (
+                        <Typography sx={{ color: "#F43A3A", fontSize: 13, textAlign: "center", mt: 1 }}>{error}</Typography>
+                    )}
                 </Box>
             )}
         </Box>
