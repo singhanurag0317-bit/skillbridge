@@ -97,7 +97,7 @@ function Hero() {
 // ─── Export ───────────────────────────────────────────────────────────────────
 export default function LandingPage() {
   return (
-    <Box sx={{ background: C.ink, minHeight: "100vh", color: C.text }}>
+    <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text }}>
       <Navbar />
       <Hero />
       <Footer />

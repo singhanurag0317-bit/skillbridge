@@ -418,7 +418,7 @@ export default function AuthPage() {
     const [mode, setMode] = useState<"login" | "register">("login");
 
     return (
-        <Box sx={{ background: C.ink, minHeight: "100vh", display: "flex", color: C.text }}>
+        <Box sx={{ background: "transparent", minHeight: "100vh", display: "flex", color: C.text }}>
             <LeftPanel />
             <Box sx={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", px: { xs: 3, md: 6 }, py: 6, position: "relative" }}>
                 <Button startIcon={<ArrowBack sx={{ fontSize: 15 }} />} onClick={() => router.push("/")} sx={{ position: "absolute", top: 24, left: 24, color: C.muted, textTransform: "none", fontSize: 13, "&:hover": { color: C.emerald, background: "transparent" } }}>

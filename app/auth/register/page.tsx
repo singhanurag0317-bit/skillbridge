@@ -402,7 +402,7 @@ export default function AuthPage() {
     const [mode, setMode] = useState<"login" | "register">("register");
 
     return (
-        <Box sx={{ background: C.ink, minHeight: "100vh", display: "flex", color: C.text }}>
+        <Box sx={{ background: "transparent", minHeight: "100vh", display: "flex", color: C.text }}>
             <LeftPanel />
 
             {/* Right: form panel */}
