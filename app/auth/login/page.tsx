@@ -126,7 +126,7 @@ function LeftPanel() {
 // ─── Login Form ───────────────────────────────────────────────────────────────
 function LoginForm({ onSwitch }: { onSwitch: () => void }) {
     const router = useRouter();
-    const { login } = useAuth();
+    const { login, googleLogin } = useAuth();
     const [showPass, setShowPass] = useState(false);
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -148,8 +148,21 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
     };
 
     const handleGoogle = async () => {
-        // Google auth not yet implemented
-        setError("Google sign-in is not yet available.");
+        setLoading(true);
+        setError("");
+        try {
+            // Simulated Google Login
+            await googleLogin({
+                email: "google.user@example.com",
+                name: "Google Explorer",
+                image: "https://lh3.googleusercontent.com/a/ACg8ocL_X_X_X_X_X_X_X_X_X_X=s96-c"
+            });
+            router.push("/dashboard");
+        } catch (e: any) {
+            setError(e?.message ?? "Google sign-in failed.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -219,7 +232,7 @@ function LoginForm({ onSwitch }: { onSwitch: () => void }) {
 // ─── Register Form ────────────────────────────────────────────────────────────
 function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
     const router = useRouter();
-    const { register } = useAuth();
+    const { register, googleLogin } = useAuth();
     const [step, setStep] = useState(1);
     const [showPass, setShowPass] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -249,7 +262,20 @@ function RegisterForm({ onSwitch }: { onSwitch: () => void }) {
     };
 
     const handleGoogle = async () => {
-        setError("Google sign-up is not yet available.");
+        setLoading(true);
+        setError("");
+        try {
+            await googleLogin({
+                email: "google.user@example.com",
+                name: "Google Explorer",
+                image: "https://lh3.googleusercontent.com/a/ACg8ocL_X_X_X_X_X_X_X_X_X_X=s96-c"
+            });
+            router.push("/onboarding");
+        } catch (e: any) {
+            setError(e?.message ?? "Google sign-up failed.");
+        } finally {
+            setLoading(false);
+        }
     };
 
     const steps = ["Account", "Profile", "Skills"];

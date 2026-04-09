@@ -45,8 +45,8 @@ export default function OnboardingPage() {
     const toggleSkill = (s: SkillCategory) =>
         setSkills(p => p.includes(s) ? p.filter(x => x !== s) : [...p, s]);
 
-    const finish = () => {
-        updateUser({ location });
+    const finish = async () => {
+        await updateUser({ location });
         success("Welcome to SkillBridge! 🎉");
         router.push("/dashboard");
     };

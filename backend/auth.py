@@ -19,7 +19,7 @@ SECRET_KEY = os.getenv("SECRET_KEY", "skillbridge-super-secret-key-change-in-pro
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 bearer_scheme = HTTPBearer(auto_error=False)
 
 

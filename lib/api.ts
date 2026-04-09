@@ -54,6 +54,10 @@ export const authApi = {
         const res = await api.post<ApiResponse<{ user: User; token: string }>>("/auth/login", data);
         return res.data;
     },
+    googleLogin: async (data: { email: string; name: string; image?: string }) => {
+        const res = await api.post<ApiResponse<{ user: User; token: string }>>("/auth/google", data);
+        return res.data;
+    },
     getMe: async () => {
         const res = await api.get<ApiResponse<User>>("/auth/me");
         return res.data;

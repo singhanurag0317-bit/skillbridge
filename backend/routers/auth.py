@@ -1,6 +1,7 @@
 # backend/routers/auth.py
 # /auth/register  /auth/login  /auth/me  /auth/profile
 
+from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -8,6 +9,14 @@ from database import get_db
 import models
 import schemas
 import auth as auth_utils
+
+# ─── Auth Schemas (Internal) ──────────────────────────────────────────────────
+import pydantic
+class GoogleLoginRequest(pydantic.BaseModel):
+    email: pydantic.EmailStr
+    name: str
+    image: Optional[str] = None
+
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -53,6 +62,39 @@ def login(body: schemas.LoginRequest, db: Session = Depends(get_db)):
     token = auth_utils.create_access_token(user.id)
 
     return schemas.ok({"user": user_out.model_dump(), "token": token}, "Login successful")
+
+
+@router.post("/google")
+def google_login(body: GoogleLoginRequest, db: Session = Depends(get_db)):
+    # In a real app, we would verify the Google ID token here.
+    # For this demo, we trust the frontend (simulated Google login).
+    user = db.query(models.User).filter(models.User.email == body.email).first()
+
+    if not user:
+        # Create new user if doesn't exist
+        user = models.User(
+            id=auth_utils.generate_id(),
+            name=body.name,
+            email=body.email,
+            avatar=body.image,
+            password_hash="google-auth-no-password",  # Placeholder
+            location="Remote",
+            city="Remote",
+            level="Seed",
+            next_level="Sprout",
+            level_progress=0,
+            impact_score=0,
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+    total = db.query(models.User).count()
+    user_out = schemas.UserOut.from_orm_user(user, total)
+    token = auth_utils.create_access_token(user.id)
+
+    return schemas.ok({"user": user_out.model_dump(), "token": token}, "Logged in with Google")
+
 
 
 @router.get("/me")
