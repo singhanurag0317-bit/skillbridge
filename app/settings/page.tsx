@@ -10,7 +10,8 @@ import {
 import { ArrowBack, Handshake, Save, Lock, Notifications, Person, Shield } from "@mui/icons-material";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
-import MobileNavDrawer from "@/components/ui/MobileNavDrawer";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import { Menu as MenuIcon } from "@mui/icons-material";
 
 const C = {
@@ -53,20 +54,8 @@ export default function SettingsPage() {
     const saveProfile = () => { updateUser({ name, bio, location }); success("Profile updated!"); };
 
     return (
-        <Box sx={{ background: C.ink, minHeight: "100vh", color: C.text }}>
-            <MobileNavDrawer open={mobileOpen} onClose={() => setMobileOpen(false)} activeHref="/settings" />
-
-            {/* Navbar */}
-            <Box sx={{ px: { xs: 2, md: 4 }, py: 1.5, display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: `1px solid ${C.border}`, background: "rgba(8,15,30,0.95)", backdropFilter: "blur(16px)", position: "sticky", top: 0, zIndex: 100 }}>
-                <Stack direction="row" alignItems="center" spacing={1}>
-                    <IconButton onClick={() => setMobileOpen(true)} sx={{ color: C.muted, display: { md: "none" } }}><MenuIcon /></IconButton>
-                    <Stack direction="row" alignItems="center" spacing={1} component={Link} href="/" sx={{ textDecoration: "none" }}>
-                        <Box sx={{ width: 32, height: 32, borderRadius: "9px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}><Handshake sx={{ fontSize: 16, color: "#fff" }} /></Box>
-                        <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 17, color: C.text }}>SkillBridge</Typography>
-                    </Stack>
-                </Stack>
-                <Button component={Link} href="/dashboard" startIcon={<ArrowBack sx={{ fontSize: 14 }} />} sx={{ color: C.muted, textTransform: "none", fontSize: 13, "&:hover": { color: C.text } }}>Dashboard</Button>
-            </Box>
+        <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text }}>
+            <Navbar />
 
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 800, fontSize: { xs: 26, md: 32 }, mb: 4 }}>Settings</Typography>
@@ -152,6 +141,7 @@ export default function SettingsPage() {
                     </Card>
                 </Stack>
             </Container>
+            <Footer />
         </Box>
     );
 }

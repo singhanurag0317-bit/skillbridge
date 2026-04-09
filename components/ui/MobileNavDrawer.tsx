@@ -17,7 +17,13 @@ const C = {
     card: "rgba(240,237,232,0.04)",
 };
 
-const NAV = [
+const PUBLIC_NAV = [
+    { label: "How it works", href: "/how-it-works", emoji: "✨" },
+    { label: "Impact",       href: "/impact",       emoji: "🌍" },
+    { label: "About us",     href: "/about",        emoji: "📖" },
+];
+
+const PRIVATE_NAV = [
     { label: "Dashboard",  href: "/dashboard", emoji: "📊" },
     { label: "Explore",    href: "/explore",   emoji: "🔍" },
     { label: "Messages",   href: "/chat",      emoji: "💬" },
@@ -82,7 +88,7 @@ export default function MobileNavDrawer({ open, onClose, activeHref }: Props) {
 
                 {/* Nav links */}
                 <Stack spacing={0.5} flex={1}>
-                    {NAV.map(l => {
+                    {(isAuthenticated ? PRIVATE_NAV : PUBLIC_NAV).map(l => {
                         const active = activeHref === l.href;
                         return (
                             <Box

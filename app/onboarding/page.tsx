@@ -9,6 +9,8 @@ import {
 import { ArrowForward, ArrowBack, CheckCircle, Handshake } from "@mui/icons-material";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import type { SkillCategory } from "@/types";
 
 const C = {
@@ -54,23 +56,18 @@ export default function OnboardingPage() {
     const progress = ((step + 1) / STEPS.length) * 100;
 
     return (
-        <Box sx={{
-            background: C.ink, minHeight: "100vh", color: C.text,
-            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-            px: 3, position: "relative", overflow: "hidden",
-        }}>
-            {/* Background glows */}
-            <Box sx={{ position: "absolute", top: "10%", left: "5%", width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle,${C.emerald}08,transparent 70%)`, pointerEvents: "none" }} />
-            <Box sx={{ position: "absolute", bottom: "10%", right: "5%", width: 300, height: 300, borderRadius: "50%", background: `radial-gradient(circle,${C.coral}08,transparent 70%)`, pointerEvents: "none" }} />
+        <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text, display: "flex", flexDirection: "column" }}>
+            <Navbar />
+            <Box sx={{
+                flex: 1,
+                display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                px: 3, py: 8, position: "relative", overflow: "hidden",
+            }}>
+                {/* Background glows */}
+                <Box sx={{ position: "absolute", top: "10%", left: "5%", width: 400, height: 400, borderRadius: "50%", background: `radial-gradient(circle,${C.emerald}08,transparent 70%)`, pointerEvents: "none" }} />
+                <Box sx={{ position: "absolute", bottom: "10%", right: "5%", width: 300, height: 300, borderRadius: "50%", background: `radial-gradient(circle,${C.coral}08,transparent 70%)`, pointerEvents: "none" }} />
 
-            <Box sx={{ width: "100%", maxWidth: 480, position: "relative", zIndex: 1 }}>
-                {/* Logo */}
-                <Stack direction="row" alignItems="center" spacing={1} justifyContent="center" mb={5}>
-                    <Box sx={{ width: 36, height: 36, borderRadius: "10px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                        <Handshake sx={{ fontSize: 18, color: "#fff" }} />
-                    </Box>
-                    <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 22, color: C.text }}>SkillBridge</Typography>
-                </Stack>
+                <Box sx={{ width: "100%", maxWidth: 480, position: "relative", zIndex: 1 }}>
 
                 {/* Progress */}
                 <Stack direction="row" alignItems="center" spacing={2} mb={1.5}>
@@ -172,6 +169,8 @@ export default function OnboardingPage() {
                     )}
                 </Stack>
             </Box>
+        </Box>
+            <Footer />
         </Box>
     );
 }

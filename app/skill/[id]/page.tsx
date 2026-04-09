@@ -2,6 +2,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import BookingConfirmDialog from "@/components/ui/BookingConfirmDialog";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import {
     Box, Button, Card, Chip, Container, Grid, Stack,
     Typography, Avatar, LinearProgress, Divider,
@@ -92,40 +94,7 @@ const SIMILAR_SKILLS = [
     { title: "Web dev bootcamp", person: "Kavya R.", rating: 5.0, location: "0.9 km", color: C.emerald },
 ];
 
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-function Navbar() {
-    return (
-        <Box sx={{
-            px: { xs: 2, md: 6 }, py: 1.5,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            borderBottom: `1px solid ${C.border}`,
-            background: "rgba(8,15,30,0.95)", backdropFilter: "blur(16px)",
-            position: "sticky", top: 0, zIndex: 100,
-        }}>
-            <Stack direction="row" alignItems="center" spacing={2}>
-                <Box sx={{ width: 32, height: 32, borderRadius: "9px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Handshake sx={{ fontSize: 16, color: "#fff" }} />
-                </Box>
-                <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 18, color: C.text }}>SkillBridge</Typography>
-            </Stack>
-            <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {[
-                    { label: "Dashboard", href: "/dashboard" },
-                    { label: "Explore", href: "/explore" },
-                    { label: "My Skills", href: "/dashboard" },
-                    { label: "Messages", href: "/chat" },
-                    { label: "Impact", href: "/impact" },
-                ].map(l => (
-                    <Typography key={l.label} component={Link} href={l.href} sx={{ color: C.muted, fontSize: 14, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
-                ))}
-            </Stack>
-            <Stack direction="row" spacing={1.5}>
-                <Button component={Link} href="/auth/login" variant="text" sx={{ color: C.muted, fontSize: 13, textTransform: "none" }}>Sign in</Button>
-                <Button component={Link} href="/auth/login" sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontSize: 13, textTransform: "none", borderRadius: "10px", px: 2.5, boxShadow: "none" }}>Join free</Button>
-            </Stack>
-        </Box>
-    );
-}
+
 
 // ─── Breadcrumb ───────────────────────────────────────────────────────────────
 function Breadcrumb() {
@@ -260,7 +229,7 @@ function SkillContent() {
                 </Stack>
                 <Grid container spacing={1.5}>
                     {AVAILABILITY.map(day => (
-                        <Grid item xs={12} sm={6} md={4} key={day.day}>
+                        <Grid size={{ xs: 12, sm: 6, md: 4 }} key={day.day}>
                             <Box sx={{
                                 p: 2, borderRadius: "12px",
                                 background: day.available ? `${C.emerald}08` : "rgba(240,237,232,0.02)",
@@ -556,7 +525,7 @@ function SimilarSkills() {
 // ─── Export ───────────────────────────────────────────────────────────────────
 export default function SkillDetailPage() {
     return (
-        <Box sx={{ background: C.ink, minHeight: "100vh", color: C.text }}>
+        <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text }}>
             <Navbar />
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 <Breadcrumb />
@@ -571,6 +540,7 @@ export default function SkillDetailPage() {
                 </Grid>
                 <SimilarSkills />
             </Container>
+            <Footer />
         </Box>
     );
 }

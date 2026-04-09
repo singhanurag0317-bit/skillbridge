@@ -9,8 +9,10 @@ import {
     LocationOn, Star, TrendingUp, People, AccessTime,
     EmojiEvents, ArrowForward, Edit, Share, BookmarkAdd,
     CheckCircle, FormatQuote, Psychology, Handshake,
-    CalendarMonth, WorkspacePremium, FiberManualRecord,
+    CalendarMonth, WorkspacePremium, FiberManualRecord, Logout,
 } from "@mui/icons-material";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 
 // ─── Color tokens ─────────────────────────────────────────────────────────────
 const C = {
@@ -78,44 +80,6 @@ const TAG_COLORS: Record<string, string> = {
     Wellness: C.emeraldLight, Creative: C.coralLight, Language: "#E8A838",
 };
 
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-function Navbar() {
-    return (
-        <Box sx={{
-            px: { xs: 2, md: 6 }, py: 1.5,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            borderBottom: `1px solid ${C.border}`,
-            background: "rgba(8,15,30,0.95)", backdropFilter: "blur(16px)",
-            position: "sticky", top: 0, zIndex: 100,
-        }}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-                <Box sx={{ width: 32, height: 32, borderRadius: "9px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Handshake sx={{ fontSize: 16, color: "#fff" }} />
-                </Box>
-                <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 18, color: C.text }}>
-                    SkillBridge
-                </Typography>
-            </Stack>
-            <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {[
-                    { label: "Dashboard", href: "/dashboard" },
-                    { label: "Explore", href: "/explore" },
-                    { label: "My Skills", href: "/dashboard" },
-                    { label: "Messages", href: "/chat" },
-                    { label: "Impact", href: "/impact" },
-                ].map(l => (
-                    <Typography key={l.label} component={Link} href={l.href} sx={{ color: C.muted, fontSize: 14, cursor: "pointer", "&:hover": { color: C.emerald }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
-                ))}
-            </Stack>
-            <Stack direction="row" spacing={1.5}>
-                <Button component={Link} href="/auth/login" variant="text" sx={{ color: C.muted, fontSize: 13, textTransform: "none" }}>Sign in</Button>
-                <Button component={Link} href="/auth/login" variant="contained" sx={{ background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontSize: 13, textTransform: "none", borderRadius: "10px", px: 2.5, boxShadow: "none" }}>
-                    Join free
-                </Button>
-            </Stack>
-        </Box>
-    );
-}
 
 // ─── Cover + Avatar ───────────────────────────────────────────────────────────
 function ProfileHero() {
@@ -180,6 +144,13 @@ function ProfileHero() {
                         }}>
                             Request session
                         </Button>
+                        <Button variant="outlined" startIcon={<Logout sx={{ fontSize: 15 }} />} sx={{
+                            borderColor: `${C.coral}44`, color: C.coral,
+                            textTransform: "none", borderRadius: "10px", fontSize: 13,
+                            "&:hover": { borderColor: C.coral, background: `${C.coral}10` },
+                        }}>
+                            Logout
+                        </Button>
                     </Stack>
                 </Stack>
 
@@ -220,7 +191,7 @@ function StatsRow() {
     return (
         <Grid container spacing={2} sx={{ mb: 3 }}>
             {STATS.map((s, i) => (
-                <Grid item xs={6} md={3} key={s.label}>
+                <Grid size={{ xs: 6, md: 3 }} key={s.label}>
                     <Card sx={{
                         background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`,
                         borderRadius: "16px", p: 2.5, textAlign: "center",
@@ -249,7 +220,7 @@ function AboutCard() {
             <Divider sx={{ borderColor: C.border, mb: 2.5 }} />
 
             <Grid container spacing={3}>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                     <Typography sx={{ color: C.faint, fontSize: 12, mb: 1, textTransform: "uppercase", letterSpacing: "0.08em" }}>Availability</Typography>
                     <Stack spacing={0.8}>
                         {PROFILE.availability.map(a => (
@@ -260,7 +231,7 @@ function AboutCard() {
                         ))}
                     </Stack>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                     <Typography sx={{ color: C.faint, fontSize: 12, mb: 1, textTransform: "uppercase", letterSpacing: "0.08em" }}>Languages</Typography>
                     <Stack direction="row" spacing={1} flexWrap="wrap">
                         {PROFILE.languages.map(l => (
@@ -268,7 +239,7 @@ function AboutCard() {
                         ))}
                     </Stack>
                 </Grid>
-                <Grid item xs={12} sm={4}>
+                <Grid size={{ xs: 12, sm: 4 }}>
                     <Typography sx={{ color: C.faint, fontSize: 12, mb: 1, textTransform: "uppercase", letterSpacing: "0.08em" }}>Level progress</Typography>
                     <Typography sx={{ fontSize: 13, color: C.muted, mb: 1 }}>
                         Towards <span style={{ color: C.gold }}>{PROFILE.nextLevel}</span>
@@ -326,7 +297,7 @@ function SkillsTab() {
                     transition: "all 0.25s",
                 }}>
                     <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} md={7}>
+                        <Grid size={{ xs: 12, md: 7 }}>
                             <Stack direction="row" alignItems="center" spacing={1.5} mb={1}>
                                 <Box sx={{ width: 42, height: 42, borderRadius: "12px", background: skill.color + "18", display: "flex", alignItems: "center", justifyContent: "center" }}>
                                     <Psychology sx={{ fontSize: 20, color: skill.color }} />
@@ -347,7 +318,7 @@ function SkillsTab() {
                             </Stack>
                             <Typography sx={{ color: C.muted, fontSize: 13, lineHeight: 1.7 }}>{skill.desc}</Typography>
                         </Grid>
-                        <Grid item xs={12} md={5}>
+                        <Grid size={{ xs: 12, md: 5 }}>
                             <Stack direction={{ xs: "row", md: "column" }} spacing={1.5} alignItems={{ xs: "center", md: "flex-end" }}>
                                 <Stack direction="row" spacing={1} alignItems="center">
                                     <WorkspacePremium sx={{ fontSize: 14, color: skill.color }} />
@@ -482,7 +453,7 @@ function ActivityTab() {
                     { label: "Best month", value: `${ACTIVITY_MONTHS.reduce((a, m) => m.sessions > a.sessions ? m : a).month} (${Math.max(...ACTIVITY_MONTHS.map(m => m.sessions))})` },
                     { label: "Avg per month", value: (ACTIVITY_MONTHS.reduce((a, m) => a + m.sessions, 0) / ACTIVITY_MONTHS.length).toFixed(1) },
                 ].map(stat => (
-                    <Grid item xs={4} key={stat.label}>
+                    <Grid size={{ xs: 4 }} key={stat.label}>
                         <Box sx={{ textAlign: "center", p: 1.5, borderRadius: "12px", background: "rgba(240,237,232,0.02)", border: `1px solid ${C.border}` }}>
                             <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: 22, fontWeight: 700, color: C.text }}>{stat.value}</Typography>
                             <Typography sx={{ fontSize: 11, color: C.faint }}>{stat.label}</Typography>
@@ -497,14 +468,15 @@ function ActivityTab() {
 // ─── Export ───────────────────────────────────────────────────────────────────
 export default function ProfilePage() {
     return (
-        <Box sx={{ background: C.ink, minHeight: "100vh", color: C.text }}>
+        <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text }}>
             <Navbar />
-            <Container maxWidth="lg" sx={{ py: 4 }}>
+            <Container maxWidth="lg" sx={{ py: 4, flexGrow: 1 }}>
                 <ProfileHero />
                 <StatsRow />
                 <AboutCard />
                 <TabsSection />
             </Container>
+            <Footer />
         </Box>
     );
 }

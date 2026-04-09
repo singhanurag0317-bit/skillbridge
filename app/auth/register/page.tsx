@@ -58,13 +58,10 @@ function LeftPanel() {
             display: { xs: "none", md: "flex" }, flexDirection: "column",
             justifyContent: "space-between",
             width: "42%", minHeight: "100vh",
-            background: `linear-gradient(160deg,${C.emerald}18 0%,${C.coral}10 50%,${C.ink} 100%)`,
+            background: "transparent",
             borderRight: `1px solid ${C.border}`,
             p: 5, position: "relative", overflow: "hidden",
         }}>
-            {/* Background orbs */}
-            <Box sx={{ position: "absolute", top: -80, left: -80, width: 300, height: 300, borderRadius: "50%", background: `radial-gradient(circle,${C.emerald}18,transparent 70%)`, pointerEvents: "none" }} />
-            <Box sx={{ position: "absolute", bottom: 60, right: -60, width: 250, height: 250, borderRadius: "50%", background: `radial-gradient(circle,${C.coral}14,transparent 70%)`, pointerEvents: "none" }} />
 
             {/* Logo */}
             <Stack direction="row" alignItems="center" spacing={1.5}>
@@ -76,7 +73,6 @@ function LeftPanel() {
 
             {/* Main copy */}
             <Box sx={{ position: "relative", zIndex: 2 }}>
-                <Chip label="Google Hackathon 2025" sx={{ mb: 3, background: `${C.emerald}18`, color: C.emerald, border: `1px solid ${C.emerald}33`, fontWeight: 600, fontSize: 12 }} />
                 <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: 38, fontWeight: 800, color: C.text, lineHeight: 1.15, mb: 2 }}>
                     Your skill is someone's <span style={{ background: `linear-gradient(90deg,${C.emerald},${C.coral})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>breakthrough.</span>
                 </Typography>
@@ -116,10 +112,7 @@ function LeftPanel() {
                 </Card>
             </Box>
 
-            {/* Bottom note */}
-            <Typography sx={{ color: C.faint, fontSize: 12 }}>
-                Smart Resource Allocation · Open Innovation Track
-            </Typography>
+
         </Box>
     );
 }
