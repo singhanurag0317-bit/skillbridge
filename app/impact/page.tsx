@@ -1,6 +1,8 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import {
     Box, Button, Card, Chip, Container, Grid, Stack,
     Typography, Avatar, LinearProgress, Divider, Tab, Tabs,
@@ -27,11 +29,11 @@ const C = {
 };
 
 // ─── Mock Data ────────────────────────────────────────────────────────────────
-const USER = {
-    name: "Anurag Sharma", initials: "AS",
-    level: "Community Champion", nextLevel: "City Legend",
-    impactScore: 87, rank: 12, totalUsers: 3800,
-    levelProgress: 67, city: "Mathura",
+const COMMUNITY = {
+    totalSessions: "12,450+",
+    activeCities: 42,
+    livesImpacted: "8,200+",
+    hoursGiven: "45,000+",
 };
 
 const METRICS = [
@@ -89,37 +91,7 @@ const IMPACT_LOCATIONS = [
     { city: "Noida", sessions: 2, color: C.coralLight },
 ];
 
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-function Navbar() {
-    return (
-        <Box sx={{
-            px: { xs: 2, md: 4 }, py: 1.5,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            borderBottom: `1px solid ${C.border}`,
-            background: "rgba(8,15,30,0.95)", backdropFilter: "blur(16px)",
-            position: "sticky", top: 0, zIndex: 100,
-        }}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-                <Box sx={{ width: 30, height: 30, borderRadius: "9px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Handshake sx={{ fontSize: 15, color: "#fff" }} />
-                </Box>
-                <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 17, color: C.text }}>SkillBridge</Typography>
-            </Stack>
-            <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {[
-                    { label: "Dashboard", href: "/dashboard" },
-                    { label: "Explore", href: "/explore" },
-                    { label: "My Skills", href: "/dashboard" },
-                    { label: "Messages", href: "/chat" },
-                    { label: "Impact", href: "/impact" },
-                ].map((l, i) => (
-                    <Typography key={l.label} component={Link} href={l.href} sx={{ color: i === 4 ? C.emerald : C.muted, fontSize: 14, cursor: "pointer", borderBottom: i === 4 ? `2px solid ${C.emerald}` : "2px solid transparent", pb: 0.3, "&:hover": { color: C.text }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
-                ))}
-            </Stack>
-            <Avatar sx={{ width: 32, height: 32, background: `linear-gradient(135deg,${C.emerald},${C.coral})`, fontSize: 12, fontWeight: 700 }}>AS</Avatar>
-        </Box>
-    );
-}
+
 
 // ─── Impact Hero ──────────────────────────────────────────────────────────────
 function ImpactHero() {
@@ -133,26 +105,23 @@ function ImpactHero() {
             <Box sx={{ position: "absolute", bottom: -40, left: "20%", width: 180, height: 180, borderRadius: "50%", background: `radial-gradient(circle,${C.emerald}0E,transparent 70%)`, pointerEvents: "none" }} />
 
             <Grid container spacing={4} alignItems="center">
-                <Grid item xs={12} md={6}>
+                <Grid size={{ xs: 12, md: 6 }}>
                     <Stack direction="row" alignItems="center" spacing={2} mb={2}>
-                        <Avatar sx={{ width: 56, height: 56, background: `linear-gradient(135deg,${C.emerald},${C.coral})`, fontSize: 18, fontWeight: 800 }}>{USER.initials}</Avatar>
                         <Box>
-                            <Typography sx={{ fontFamily: "'Playfair Display',serif", color: C.text, fontWeight: 800, fontSize: { xs: 20, md: 24 } }}>{USER.name}</Typography>
-                            <Stack direction="row" alignItems="center" spacing={0.8}>
-                                <EmojiEvents sx={{ fontSize: 14, color: C.gold }} />
-                                <Typography sx={{ fontSize: 13, color: C.gold, fontWeight: 600 }}>{USER.level}</Typography>
-                                <Typography sx={{ fontSize: 12, color: C.faint }}>· {USER.city}</Typography>
+                            <Typography sx={{ fontFamily: "'Playfair Display',serif", color: C.text, fontWeight: 800, fontSize: { xs: 24, md: 32 } }}>Global Community Impact</Typography>
+                            <Stack direction="row" alignItems="center" spacing={0.8} mt={1}>
+                                <Typography sx={{ fontSize: 13, color: C.muted }}>Together, we are bridging skill gaps</Typography>
                             </Stack>
                         </Box>
                     </Stack>
 
                     <Stack direction="row" alignItems="baseline" spacing={1.5} mb={1.5}>
-                        <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: { xs: 56, md: 72 }, fontWeight: 800, color: C.text, lineHeight: 1 }}>{USER.impactScore}</Typography>
+                        <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: { xs: 56, md: 72 }, fontWeight: 800, color: C.text, lineHeight: 1 }}>{COMMUNITY.totalSessions}</Typography>
                         <Box>
-                            <Typography sx={{ fontSize: 14, color: C.muted }}>Impact score</Typography>
+                            <Typography sx={{ fontSize: 14, color: C.muted }}>Sessions hosted</Typography>
                             <Stack direction="row" alignItems="center" spacing={0.5}>
                                 <TrendingUp sx={{ fontSize: 14, color: C.emerald }} />
-                                <Typography sx={{ fontSize: 13, color: C.emerald, fontWeight: 600 }}>+8 this month</Typography>
+                                <Typography sx={{ fontSize: 13, color: C.emerald, fontWeight: 600 }}>+450 this week</Typography>
                             </Stack>
                         </Box>
                     </Stack>
@@ -160,30 +129,13 @@ function ImpactHero() {
                     <Stack direction="row" alignItems="center" spacing={1} mb={2}>
                         <WorkspacePremium sx={{ fontSize: 15, color: C.coral }} />
                         <Typography sx={{ fontSize: 13, color: C.muted }}>
-                            Ranked <strong style={{ color: C.coral }}>#{USER.rank}</strong> of {USER.totalUsers.toLocaleString()} in your city
+                            Join a movement of <strong style={{ color: C.coral }}>{COMMUNITY.livesImpacted}</strong> members across <strong style={{ color: C.gold }}>{COMMUNITY.activeCities}</strong> cities
                         </Typography>
                     </Stack>
-
-                    {/* Level progress */}
-                    <Box>
-                        <Stack direction="row" justifyContent="space-between" mb={0.8}>
-                            <Typography sx={{ fontSize: 12, color: C.muted }}>
-                                Towards <span style={{ color: C.gold }}>{USER.nextLevel}</span>
-                            </Typography>
-                            <Typography sx={{ fontSize: 12, color: C.muted }}>{USER.levelProgress}%</Typography>
-                        </Stack>
-                        <LinearProgress variant="determinate" value={USER.levelProgress} sx={{
-                            height: 8, borderRadius: 4, background: C.border,
-                            "& .MuiLinearProgress-bar": { background: `linear-gradient(90deg,${C.emerald},${C.coral})`, borderRadius: 4 },
-                        }} />
-                        <Typography sx={{ fontSize: 11, color: C.faint, mt: 0.6 }}>
-                            13 more points to reach {USER.nextLevel}
-                        </Typography>
-                    </Box>
                 </Grid>
 
                 {/* Right: score ring visual */}
-                <Grid item xs={12} md={6} sx={{ display: { xs: "none", md: "flex" }, justifyContent: "center" }}>
+                <Grid size={{ xs: 12, md: 6 }} sx={{ display: { xs: "none", md: "flex" }, justifyContent: "center" }}>
                     <Box sx={{ position: "relative", width: 220, height: 220 }}>
                         {/* Outer ring */}
                         <Box sx={{
@@ -193,7 +145,7 @@ function ImpactHero() {
                         {/* Progress arc (simulated with conic gradient) */}
                         <Box sx={{
                             position: "absolute", inset: 0, borderRadius: "50%",
-                            background: `conic-gradient(${C.emerald} 0% ${USER.levelProgress}%, rgba(240,237,232,0.05) ${USER.levelProgress}% 100%)`,
+                            background: `conic-gradient(${C.emerald} 0% 100%, rgba(240,237,232,0.05) 100% 100%)`,
                         }} />
                         {/* Inner circle */}
                         <Box sx={{
@@ -201,11 +153,11 @@ function ImpactHero() {
                             background: C.ink,
                             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
                         }}>
-                            <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: 44, fontWeight: 800, color: C.text, lineHeight: 1 }}>{USER.impactScore}</Typography>
-                            <Typography sx={{ fontSize: 12, color: C.muted }}>Impact score</Typography>
+                            <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: 44, fontWeight: 800, color: C.text, lineHeight: 1 }}>{COMMUNITY.hoursGiven}</Typography>
+                            <Typography sx={{ fontSize: 12, color: C.muted }}>Hours Taught</Typography>
                             <Stack direction="row" alignItems="center" spacing={0.4} mt={0.5}>
                                 <FiberManualRecord sx={{ fontSize: 8, color: C.emerald }} />
-                                <Typography sx={{ fontSize: 11, color: C.emerald, fontWeight: 600 }}>Top 1%</Typography>
+                                <Typography sx={{ fontSize: 11, color: C.emerald, fontWeight: 600 }}>All Time</Typography>
                             </Stack>
                         </Box>
                     </Box>
@@ -220,7 +172,7 @@ function MetricsRow() {
     return (
         <Grid container spacing={2} sx={{ mb: 3 }}>
             {METRICS.map((m, i) => (
-                <Grid item xs={6} md={3} key={m.label}>
+                <Grid size={{ xs: 6, md: 3 }} key={m.label}>
                     <Card sx={{
                         background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`,
                         borderRadius: "16px", p: 2.5,
@@ -237,9 +189,9 @@ function MetricsRow() {
                                 : <Typography sx={{ fontSize: 11, color: C.faint }}>—</Typography>
                             }
                         </Stack>
-                        <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: 30, fontWeight: 800, color: C.text, lineHeight: 1 }}>{m.value}</Typography>
+                        <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: 30, fontWeight: 800, color: C.text, lineHeight: 1 }}>{m.value}k</Typography>
                         <Typography sx={{ fontSize: 12, color: C.muted, mt: 0.5 }}>{m.label}</Typography>
-                        <Typography sx={{ fontSize: 11, color: C.faint, mt: 0.3 }}>vs {m.prev} last period</Typography>
+                        <Typography sx={{ fontSize: 11, color: C.faint, mt: 0.3 }}>vs {m.prev}k last period</Typography>
                     </Card>
                 </Grid>
             ))}
@@ -255,7 +207,7 @@ function ChartsSection() {
     return (
         <Grid container spacing={3} sx={{ mb: 3 }}>
             {/* Bar chart */}
-            <Grid item xs={12} md={7}>
+            <Grid size={{ xs: 12, md: 7 }}>
                 <Card sx={{ background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`, borderRadius: "20px", p: 3, height: "100%" }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center" mb={3}>
                         <Typography sx={{ fontFamily: "'Playfair Display',serif", color: C.text, fontWeight: 700, fontSize: 18 }}>Activity over time</Typography>
@@ -306,7 +258,7 @@ function ChartsSection() {
             </Grid>
 
             {/* Skills breakdown */}
-            <Grid item xs={12} md={5}>
+            <Grid size={{ xs: 12, md: 5 }}>
                 <Card sx={{ background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`, borderRadius: "20px", p: 3, height: "100%" }}>
                     <Typography sx={{ fontFamily: "'Playfair Display',serif", color: C.text, fontWeight: 700, fontSize: 18, mb: 3 }}>Skills breakdown</Typography>
                     <Stack spacing={2.5}>
@@ -343,7 +295,7 @@ function ChartsSection() {
                             { label: "Total hours", value: "38" },
                             { label: "Avg rating", value: "4.9" },
                         ].map(stat => (
-                            <Grid item xs={4} key={stat.label}>
+                            <Grid size={{ xs: 4 }} key={stat.label}>
                                 <Box sx={{ textAlign: "center", p: 1, borderRadius: "10px", background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}` }}>
                                     <Typography sx={{ fontFamily: "'Playfair Display',serif", fontSize: 20, fontWeight: 700, color: C.text }}>{stat.value}</Typography>
                                     <Typography sx={{ fontSize: 10, color: C.faint }}>{stat.label}</Typography>
@@ -462,7 +414,7 @@ function BadgesSection() {
 
             <Grid container spacing={2}>
                 {shown.map((badge, i) => (
-                    <Grid item xs={6} sm={4} md={3} key={badge.id}>
+                    <Grid size={{ xs: 6, sm: 4, md: 3 }} key={badge.id}>
                         <Box sx={{
                             p: 2.5, borderRadius: "16px", textAlign: "center",
                             background: badge.earned ? badge.color + "0D" : "rgba(240,237,232,0.02)",
@@ -506,7 +458,7 @@ function ImpactMap() {
                 {IMPACT_LOCATIONS.map((loc, i) => {
                     const pct = Math.round((loc.sessions / total) * 100);
                     return (
-                        <Grid item xs={12} sm={6} md={3} key={loc.city}>
+                        <Grid size={{ xs: 12, sm: 6, md: 3 }} key={loc.city}>
                             <Box sx={{
                                 p: 2.5, borderRadius: "16px",
                                 background: loc.color + "0A",
@@ -555,7 +507,7 @@ function ImpactMap() {
 // ─── Export ───────────────────────────────────────────────────────────────────
 export default function ImpactPage() {
     return (
-        <Box sx={{ background: C.ink, minHeight: "100vh", color: C.text }}>
+        <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text }}>
             <Navbar />
             <Container maxWidth="lg" sx={{ py: 4 }}>
                 <ImpactHero />
@@ -565,6 +517,7 @@ export default function ImpactPage() {
                 <BadgesSection />
                 <ImpactMap />
             </Container>
+            <Footer />
         </Box>
     );
 }

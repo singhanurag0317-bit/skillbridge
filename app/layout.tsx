@@ -3,6 +3,8 @@ import ThemeRegistry from "@/theme/ThemeRegistry";
 import { AuthProvider } from "@/context/AuthContext";
 import { ToastProvider } from "@/context/ToastContext";
 import CommandPaletteWrapper from "@/components/ui/CommandPaletteWrapper";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import NeuralBackground from "@/components/ui/NeuralBackground";
 
 export const metadata: Metadata = {
   title: "SkillBridge — Share a skill, change a life",
@@ -22,8 +24,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeRegistry>
           <AuthProvider>
             <ToastProvider>
-              {children}
-              <CommandPaletteWrapper />
+              <NeuralBackground />
+              <ProtectedRoute>
+                {children}
+                <CommandPaletteWrapper />
+              </ProtectedRoute>
             </ToastProvider>
           </AuthProvider>
         </ThemeRegistry>

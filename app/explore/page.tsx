@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import {
     Box, Button, Card, Chip, Container, Grid, Stack,
     Typography, Avatar, IconButton, TextField, InputAdornment,
@@ -67,37 +69,7 @@ const MAP_PINS = [
     { id: 12, x: 68, y: 22, title: "Calligraphy", color: C.coralLight },
 ];
 
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-function Navbar() {
-    return (
-        <Box sx={{
-            px: { xs: 2, md: 4 }, py: 1.5,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            borderBottom: `1px solid ${C.border}`,
-            background: "rgba(8,15,30,0.97)", backdropFilter: "blur(16px)",
-            position: "sticky", top: 0, zIndex: 100,
-        }}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-                <Box sx={{ width: 30, height: 30, borderRadius: "9px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Handshake sx={{ fontSize: 15, color: "#fff" }} />
-                </Box>
-                <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 17, color: C.text }}>SkillBridge</Typography>
-            </Stack>
-            <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {[
-                    { label: "Dashboard", href: "/dashboard" },
-                    { label: "Explore", href: "/explore" },
-                    { label: "My Skills", href: "/dashboard" },
-                    { label: "Messages", href: "/chat" },
-                    { label: "Impact", href: "/impact" },
-                ].map((l, i) => (
-                    <Typography key={l.label} component={Link} href={l.href} sx={{ color: i === 1 ? C.emerald : C.muted, fontSize: 14, cursor: "pointer", borderBottom: i === 1 ? `2px solid ${C.emerald}` : "2px solid transparent", pb: 0.3, "&:hover": { color: C.text }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
-                ))}
-            </Stack>
-            <Avatar sx={{ width: 32, height: 32, background: `linear-gradient(135deg,${C.emerald},${C.coral})`, fontSize: 12, fontWeight: 700 }}>AS</Avatar>
-        </Box>
-    );
-}
+
 
 // ─── Search Hero ──────────────────────────────────────────────────────────────
 function SearchHero({ query, setQuery }: { query: string; setQuery: (v: string) => void }) {
@@ -467,9 +439,9 @@ export default function ExplorePage() {
     const clearFilters = () => { setMaxDist(10); setMinRating(4.0); setOnlyAvailable(false); setActiveCategory("All"); setQuery(""); };
 
     return (
-        <Box sx={{ background: C.ink, minHeight: "100vh", color: C.text }}>
+        <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text, display: "flex", flexDirection: "column" }}>
             <Navbar />
-            <Container maxWidth="xl" sx={{ py: 4 }}>
+            <Container maxWidth="xl" sx={{ py: 4, flexGrow: 1 }}>
                 <SearchHero query={query} setQuery={setQuery} />
                 <CategoryPills active={activeCategory} setActive={setActiveCategory} />
 
@@ -507,7 +479,7 @@ export default function ExplorePage() {
                 <Grid container spacing={3}>
                     {/* Filter sidebar */}
                     {showFilters && (
-                        <Grid item xs={12} md={3}>
+                        <Grid size={{ xs: 12, md: 3 }}>
                             <FilterSidebar
                                 maxDist={maxDist} setMaxDist={setMaxDist}
                                 minRating={minRating} setMinRating={setMinRating}
@@ -518,12 +490,12 @@ export default function ExplorePage() {
                     )}
 
                     {/* Content */}
-                    <Grid item xs={12} md={showFilters ? 9 : 12}>
+                    <Grid size={{ xs: 12, md: showFilters ? 9 : 12 }}>
                         {viewMode === "grid" ? (
                             filtered.length > 0 ? (
                                 <Grid container spacing={2.5}>
                                     {filtered.map((skill, i) => (
-                                        <Grid item xs={12} sm={6} lg={showFilters ? 4 : 3} key={skill.id}>
+                                        <Grid size={{ xs: 12, sm: 6, lg: showFilters ? 4 : 3 }} key={skill.id}>
                                             <SkillCard skill={skill} index={i} />
                                         </Grid>
                                     ))}
@@ -542,6 +514,7 @@ export default function ExplorePage() {
                     </Grid>
                 </Grid>
             </Container>
+            <Footer />
         </Box>
     );
 }

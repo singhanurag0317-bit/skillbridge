@@ -36,7 +36,7 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (res) => res,
     (err) => {
-        const msg = err.response?.data?.message || err.message || "Something went wrong";
+        const msg = err.response?.data?.detail || err.response?.data?.message || err.message || "Something went wrong";
         console.error("API Error:", msg);
         return Promise.reject(new Error(msg));
     }

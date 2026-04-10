@@ -9,7 +9,7 @@ const C = { emerald: "#10B981", coral: "#F4623A", ink: "#080F1E", border: "rgba(
 export default function Loading() {
     return (
         <Box sx={{
-            background: C.ink, minHeight: "100vh",
+            background: "transparent", minHeight: "100vh",
             display: "flex", alignItems: "center", justifyContent: "center",
         }}>
             <Stack alignItems="center" spacing={3}>

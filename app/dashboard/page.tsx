@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import MobileNavDrawer from "@/components/ui/MobileNavDrawer";
-import NotificationsDrawer from "@/components/ui/NotificationsDrawer";
+import Navbar from "@/components/layout/Navbar";
+import Footer from "@/components/layout/Footer";
 import AddSkillModal from "@/components/forms/AddSkillModal";
 import { useToast } from "@/context/ToastContext";
 import { dashboardApi, requestsApi, skillsApi } from "@/lib/api";
@@ -55,57 +55,6 @@ const ACTIVITY_COLORS: Record<string, string> = {
     review: C.coral, badge: C.coralLight, scheduled: C.gold,
 };
 
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-function DashboardNav({ setMobileOpen, setNotifsOpen, setAddSkillOpen, initials }: any) {
-    return (
-        <Box sx={{
-            px: { xs: 2, md: 4 }, py: 1.5,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            borderBottom: `1px solid ${C.border}`,
-            background: "rgba(8,15,30,0.95)", backdropFilter: "blur(16px)",
-            position: "sticky", top: 0, zIndex: 100,
-        }}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-                <IconButton onClick={() => setMobileOpen(true)} sx={{ color: C.muted, display: { md: "none" } }}><MenuIcon /></IconButton>
-                <Box sx={{ width: 32, height: 32, borderRadius: "9px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Handshake sx={{ fontSize: 16, color: "#fff" }} />
-                </Box>
-                <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 18, color: C.text }}>SkillBridge</Typography>
-            </Stack>
-
-            <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {[
-                    { label: "Dashboard", href: "/dashboard" },
-                    { label: "Explore", href: "/explore" },
-                    { label: "My Skills", href: "/dashboard" },
-                    { label: "Messages", href: "/chat" },
-                    { label: "Impact", href: "/impact" },
-                ].map((l, i) => (
-                    <Typography key={l.label} component={Link} href={l.href} sx={{
-                        color: i === 0 ? C.emerald : C.muted, fontSize: 14, cursor: "pointer",
-                        borderBottom: i === 0 ? `2px solid ${C.emerald}` : "2px solid transparent",
-                        pb: 0.3, "&:hover": { color: C.text }, transition: "color 0.2s",
-                        textDecoration: "none",
-                    }}>{l.label}</Typography>
-                ))}
-            </Stack>
-
-            <Stack direction="row" alignItems="center" spacing={1.5}>
-                <IconButton onClick={() => setNotifsOpen(true)} sx={{ color: C.muted, "&:hover": { color: C.text } }}>
-                    <Badge badgeContent={2} sx={{ "& .MuiBadge-badge": { background: C.coral, color: "#fff" } }}>
-                        <Notifications sx={{ fontSize: 20 }} />
-                    </Badge>
-                </IconButton>
-                <IconButton component={Link} href="/settings" sx={{ color: C.muted, "&:hover": { color: C.text } }}>
-                    <Settings sx={{ fontSize: 20 }} />
-                </IconButton>
-                <Avatar component={Link} href="/profile/1" sx={{ width: 34, height: 34, background: `linear-gradient(135deg,${C.emerald},${C.coral})`, fontSize: 13, fontWeight: 700, cursor: "pointer", textDecoration: "none" }}>
-                    {initials || "U"}
-                </Avatar>
-            </Stack>
-        </Box>
-    );
-}
 
 // ─── Welcome Header ───────────────────────────────────────────────────────────
 function WelcomeHeader({ user, setAddSkillOpen }: { user: User | null; setAddSkillOpen: (v: boolean) => void }) {
@@ -396,8 +345,6 @@ function RecentActivity({ activity }: { activity: { id: number; text: string; ti
 
 // ─── Export ───────────────────────────────────────────────────────────────────
 export default function DashboardPage() {
-    const [mobileOpen, setMobileOpen] = useState(false);
-    const [notifsOpen, setNotifsOpen] = useState(false);
     const [addSkillOpen, setAddSkillOpen] = useState(false);
 
     // ── Auth context — wait for token restore before fetching ────────────────
@@ -453,19 +400,17 @@ export default function DashboardPage() {
 
     if (authLoading || loading) {
         return (
-            <Box sx={{ background: C.ink, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Box sx={{ background: "transparent", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <CircularProgress sx={{ color: C.emerald }} />
             </Box>
         );
     }
 
     return (
-        <Box sx={{ background: C.ink, minHeight: "100vh", color: C.text }}>
-            <MobileNavDrawer open={mobileOpen} onClose={() => setMobileOpen(false)} activeHref="/dashboard" />
-            <NotificationsDrawer open={notifsOpen} onClose={() => setNotifsOpen(false)} />
+        <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text }}>
             <AddSkillModal open={addSkillOpen} onClose={() => { setAddSkillOpen(false); fetchDash(); }} />
-            <DashboardNav setMobileOpen={setMobileOpen} setNotifsOpen={setNotifsOpen} setAddSkillOpen={setAddSkillOpen} initials={dashData?.user?.initials ?? "U"} />
-            <Container maxWidth="xl" sx={{ py: 4 }}>
+            <Navbar />
+            <Container maxWidth="xl" sx={{ py: 4, flexGrow: 1 }}>
                 <WelcomeHeader user={dashData?.user ?? null} setAddSkillOpen={setAddSkillOpen} />
                 <StatsRow stats={dashData?.stats ?? null} />
                 <Grid container spacing={3} sx={{ mb: 3 }}>
@@ -475,6 +420,7 @@ export default function DashboardPage() {
                 <Box sx={{ mb: 3 }}><RecommendedMatches recommended={dashData?.recommended ?? []} /></Box>
                 <RecentActivity activity={dashData?.recentActivity ?? []} />
             </Container>
+            <Footer />
         </Box>
     );
 }

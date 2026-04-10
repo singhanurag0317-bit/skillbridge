@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
+import Navbar from "@/components/layout/Navbar";
 import {
     Box, Button, Card, Chip, Container, Stack,
     Typography, Avatar, IconButton, Divider, Badge,
@@ -111,37 +112,7 @@ interface Message {
     read: boolean;
 }
 
-// ─── Navbar ───────────────────────────────────────────────────────────────────
-function Navbar() {
-    return (
-        <Box sx={{
-            px: { xs: 2, md: 4 }, py: 1.5,
-            display: "flex", alignItems: "center", justifyContent: "space-between",
-            borderBottom: `1px solid ${C.border}`,
-            background: "rgba(8,15,30,0.97)", backdropFilter: "blur(16px)",
-            position: "sticky", top: 0, zIndex: 100,
-        }}>
-            <Stack direction="row" alignItems="center" spacing={1}>
-                <Box sx={{ width: 30, height: 30, borderRadius: "9px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <Handshake sx={{ fontSize: 15, color: "#fff" }} />
-                </Box>
-                <Typography sx={{ fontFamily: "'Playfair Display',serif", fontWeight: 700, fontSize: 17, color: C.text }}>SkillBridge</Typography>
-            </Stack>
-            <Stack direction="row" spacing={3} sx={{ display: { xs: "none", md: "flex" } }}>
-                {[
-                    { label: "Dashboard", href: "/dashboard" },
-                    { label: "Explore", href: "/explore" },
-                    { label: "My Skills", href: "/dashboard" },
-                    { label: "Messages", href: "/chat" },
-                    { label: "Impact", href: "/impact" },
-                ].map((l, i) => (
-                    <Typography key={l.label} component={Link} href={l.href} sx={{ color: i === 3 ? C.emerald : C.muted, fontSize: 14, cursor: "pointer", borderBottom: i === 3 ? `2px solid ${C.emerald}` : "2px solid transparent", pb: 0.3, "&:hover": { color: C.text }, transition: "color 0.2s", textDecoration: "none" }}>{l.label}</Typography>
-                ))}
-            </Stack>
-            <Avatar sx={{ width: 32, height: 32, background: `linear-gradient(135deg,${C.emerald},${C.coral})`, fontSize: 12, fontWeight: 700, cursor: "pointer" }}>AS</Avatar>
-        </Box>
-    );
-}
+
 
 // ─── Conversation List ────────────────────────────────────────────────────────
 function ConversationList({ activeId, onSelect }: { activeId: number; onSelect: (id: number) => void }) {
