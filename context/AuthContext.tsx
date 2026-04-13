@@ -15,6 +15,7 @@ interface AuthContextType {
     loading: boolean;
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
+    googleLogin: (data: { email: string; name: string; image?: string }) => Promise<void>;
     register: (data: {
         name: string;
         email: string;
@@ -22,7 +23,7 @@ interface AuthContextType {
         location: string;
     }) => Promise<void>;
     logout: () => void;
-    updateUser: (data: Partial<User>) => void;
+    updateUser: (data: Partial<User>) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -87,6 +88,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
+    // ── Google Login ──────────────────────────────────────────────────────────
+    const googleLogin = async (credential: string) => {
+        setLoading(true);
+        try {
+            const res = await authApi.googleLogin({ credential });
+            if (!res.success || !res.data) throw new Error(res.message ?? "Google login failed");
+            const { user: loggedIn, token } = res.data as { user: User; token: string };
+            localStorage.setItem(TOKEN_KEY, token);
+            localStorage.setItem(USER_KEY, JSON.stringify(loggedIn));
+            setUser(loggedIn);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     // ── Register ──────────────────────────────────────────────────────────────
     const register = async (data: {
         name: string;
@@ -115,11 +131,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     // ── Update user (e.g. after profile edit) ─────────────────────────────────
-    const updateUser = (data: Partial<User>) => {
+    const updateUser = async (data: Partial<User>) => {
         if (!user) return;
-        const updated = { ...user, ...data };
-        setUser(updated);
-        localStorage.setItem(USER_KEY, JSON.stringify(updated));
+        try {
+            const res = await authApi.updateProfile(data);
+            if (res.success && res.data) {
+                setUser(res.data as User);
+                localStorage.setItem(USER_KEY, JSON.stringify(res.data));
+            }
+        } catch (err) {
+            console.error("Failed to update user profile:", err);
+            // Fallback to local update if backend fails (not ideal but better than nothing)
+            const updated = { ...user, ...data };
+            setUser(updated);
+            localStorage.setItem(USER_KEY, JSON.stringify(updated));
+        }
     };
 
     return (
@@ -129,6 +155,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 loading,
                 isAuthenticated: !!user,
                 login,
+                googleLogin,
                 register,
                 logout,
                 updateUser,

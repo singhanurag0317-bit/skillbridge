@@ -7,6 +7,7 @@ import {
 } from "@mui/material";
 import { Close, CheckCircle, CalendarToday, AccessTime, LocationOn } from "@mui/icons-material";
 import { useToast } from "@/context/ToastContext";
+import { requestsApi } from "@/lib/api";
 
 const C = {
     emerald: "#10B981", coral: "#F4623A", gold: "#F4B83A",
@@ -17,13 +18,14 @@ const C = {
 interface Props {
     open: boolean;
     onClose: () => void;
+    skillId: string | number;
     skillTitle: string;
     providerName: string;
     providerInitials: string;
     selectedSlot: string;
 }
 
-export default function BookingConfirmDialog({ open, onClose, skillTitle, providerName, providerInitials, selectedSlot }: Props) {
+export default function BookingConfirmDialog({ open, onClose, skillId, skillTitle, providerName, providerInitials, selectedSlot }: Props) {
     const { success } = useToast();
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
@@ -31,11 +33,20 @@ export default function BookingConfirmDialog({ open, onClose, skillTitle, provid
 
     const handleConfirm = async () => {
         setLoading(true);
-        await new Promise(r => setTimeout(r, 900)); // TODO: call requestsApi.create(...)
-        setLoading(false);
-        setConfirmed(true);
-        success("Session requested! You'll hear back within 2 hours.");
-        setTimeout(() => { onClose(); setConfirmed(false); setMessage(""); }, 2000);
+        try {
+            await requestsApi.create({
+                skillId,
+                message: message || `Hi ${providerName}, I'd like to request a session for ${skillTitle} at ${selectedSlot}.`,
+                scheduledAt: selectedSlot
+            });
+            setConfirmed(true);
+            success("Session requested! You'll hear back within 2 hours.");
+            setTimeout(() => { onClose(); setConfirmed(false); setMessage(""); }, 2000);
+        } catch (e: any) {
+            console.error("Booking error:", e);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (

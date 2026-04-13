@@ -29,7 +29,7 @@ def clear_tables():
 
 def seed():
     clear_tables()
-    print("🌱 Seeding SkillBridge demo data...")
+    print("Seeding SkillBridge demo data...")
 
     # ─── Users ───────────────────────────────────────────────────────────────
     u1 = models.User(
@@ -109,7 +109,7 @@ def seed():
     db.refresh(u1)
     db.refresh(u2)
     db.refresh(u3)
-    print(f"  ✅ Created users: {u1.name}, {u2.name}, {u3.name}")
+    print(f"  Created users: {u1.name}, {u2.name}, {u3.name}")
 
     # ─── Skills ──────────────────────────────────────────────────────────────
     skills_data = [
@@ -312,7 +312,7 @@ def seed():
     db.commit()
     for s in skill_objs:
         db.refresh(s)
-    print(f"  ✅ Created {len(skill_objs)} skills")
+    print(f"  Created {len(skill_objs)} skills")
 
     # ─── Requests ────────────────────────────────────────────────────────────
     r1 = models.SkillRequest(
@@ -353,7 +353,7 @@ def seed():
     db.add_all([r1, r2, r3, r4])
     db.commit()
     db.refresh(r1)
-    print("  ✅ Created 4 skill requests")
+    print("  Created 4 skill requests")
 
     # ─── Reviews ─────────────────────────────────────────────────────────────
     reviews = [
@@ -384,7 +384,7 @@ def seed():
     ]
     db.add_all(reviews)
     db.commit()
-    print("  ✅ Created 3 reviews")
+    print("  Created 3 reviews")
 
     # ─── Messages ─────────────────────────────────────────────────────────────
     msgs = [
@@ -437,16 +437,16 @@ def seed():
     u3.skills_shared = 1
     db.commit()
 
-    print("  ✅ Created messages and updated stats")
+    print("  Created messages and updated stats")
     print()
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
-    print("🎉 Demo data seeded successfully!")
+    print("-" * 50)
+    print("Demo data seeded successfully!")
     print()
     print("Demo login credentials:")
-    print(f"  👤 {u1.name:<20} {u1.email} / demo1234")
-    print(f"  👤 {u2.name:<20} {u2.email} / demo1234")
-    print(f"  👤 {u3.name:<20} {u3.email} / demo1234")
-    print("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━")
+    print(f"  - {u1.name:<20} {u1.email} / demo1234")
+    print(f"  - {u2.name:<20} {u2.email} / demo1234")
+    print(f"  - {u3.name:<20} {u3.email} / demo1234")
+    print("-" * 50)
 
     db.close()
 
