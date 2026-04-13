@@ -9,6 +9,7 @@ import {
 } from "@mui/material";
 import { Close, Add } from "@mui/icons-material";
 import { useToast } from "@/context/ToastContext";
+import { skillsApi } from "@/lib/api";
 import type { SkillCategory } from "@/types";
 
 const C = {
@@ -49,12 +50,25 @@ export default function AddSkillModal({ open, onClose, onAdded }: Props) {
         if (!form.title.trim() || !form.description.trim()) return;
         setLoading(true);
         try {
-            await new Promise(r => setTimeout(r, 800)); // TODO: call skillsApi.create(form)
+            await skillsApi.create({
+                title: form.title,
+                description: form.description,
+                category: form.category,
+                location: "Online / Mathura", // Default or get from user profile
+                lat: 0,
+                lng: 0,
+                availability: [form.duration, form.format], // Simple mapping for now
+                tags: form.tags,
+            });
             success("Skill added successfully! 🎉");
             onAdded?.();
             onClose();
             setForm({ title: "", category: "Tech", description: "", duration: "1 hour", format: "Online", tags: [] });
-        } finally { setLoading(false); }
+        } catch (e: any) {
+            console.error("Create skill error:", e);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const inputSx = {

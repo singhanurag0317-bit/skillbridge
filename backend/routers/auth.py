@@ -1,9 +1,12 @@
 # backend/routers/auth.py
 # /auth/register  /auth/login  /auth/me  /auth/profile
 
+import os
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from google.oauth2 import id_token
+from google.auth.transport import requests
 
 from database import get_db
 import models
@@ -13,9 +16,7 @@ import auth as auth_utils
 # ─── Auth Schemas (Internal) ──────────────────────────────────────────────────
 import pydantic
 class GoogleLoginRequest(pydantic.BaseModel):
-    email: pydantic.EmailStr
-    name: str
-    image: Optional[str] = None
+    credential: str  # The ID Token from Google
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -66,28 +67,39 @@ def login(body: schemas.LoginRequest, db: Session = Depends(get_db)):
 
 @router.post("/google")
 def google_login(body: GoogleLoginRequest, db: Session = Depends(get_db)):
-    # In a real app, we would verify the Google ID token here.
-    # For this demo, we trust the frontend (simulated Google login).
-    user = db.query(models.User).filter(models.User.email == body.email).first()
+    # ─── Verify Google ID Token ──────────────────────────────────────────────
+    try:
+        client_id = os.getenv("GOOGLE_CLIENT_ID")
+        # In case env is missing for demo, we might need a fallback or clear error
+        if not client_id:
+            # For development, if client_id is missing, we might want to log it
+            # But in production, this is mandatory.
+            pass
+
+        idinfo = id_token.verify_oauth2_token(
+            body.credential, 
+            requests.Request(), 
+            client_id
+        )
+
+        email = idinfo["email"]
+        name = idinfo.get("name", email.split("@")[0])
+        # picture = idinfo.get("picture")
+
+    except ValueError:
+        raise HTTPException(status_code=401, detail="Invalid Google token")
+    except Exception as e:
+        print(f"Google auth error: {e}")
+        raise HTTPException(status_code=401, detail="Google authentication failed")
+
+    # ─── Find user ───────────────────────────────────────────────────────────
+    user = db.query(models.User).filter(models.User.email == email).first()
 
     if not user:
-        # Create new user if doesn't exist
-        user = models.User(
-            id=auth_utils.generate_id(),
-            name=body.name,
-            email=body.email,
-            avatar=body.image,
-            password_hash="google-auth-no-password",  # Placeholder
-            location="Remote",
-            city="Remote",
-            level="Seed",
-            next_level="Sprout",
-            level_progress=0,
-            impact_score=0,
+        raise HTTPException(
+            status_code=401, 
+            detail="Account not found. Please register manually first if you don't have an account."
         )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
 
     total = db.query(models.User).count()
     user_out = schemas.UserOut.from_orm_user(user, total)

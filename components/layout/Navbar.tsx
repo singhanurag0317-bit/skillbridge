@@ -170,7 +170,7 @@ export default function Navbar() {
                         </IconButton>
                         <Avatar
                             component={Link}
-                            href="/profile/1"
+                            href={`/profile/${user.id}`}
                             sx={{
                                 width: 42, height: 42,
                                 background: `linear-gradient(135deg,${C.emerald},${C.coral})`,

@@ -89,10 +89,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     // ── Google Login ──────────────────────────────────────────────────────────
-    const googleLogin = async (data: { email: string; name: string; image?: string }) => {
+    const googleLogin = async (credential: string) => {
         setLoading(true);
         try {
-            const res = await authApi.googleLogin(data);
+            const res = await authApi.googleLogin({ credential });
             if (!res.success || !res.data) throw new Error(res.message ?? "Google login failed");
             const { user: loggedIn, token } = res.data as { user: User; token: string };
             localStorage.setItem(TOKEN_KEY, token);
