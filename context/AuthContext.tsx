@@ -8,7 +8,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { User } from "@/types";
 import { authApi } from "@/lib/api";
-import api from "@/lib/api";
 
 interface AuthContextType {
     user: User | null;
@@ -30,16 +29,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 const TOKEN_KEY = "sb_token";
 const USER_KEY = "sb_user";
-
-// ─── Inject the JWT into every outgoing request ───────────────────────────────
-api.interceptors.request.use((config) => {
-    const token = localStorage.getItem(TOKEN_KEY);
-    if (token) {
-        config.headers = config.headers ?? {};
-        config.headers.Authorization = `Bearer ${token}`;
-    }
-    return config;
-});
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);

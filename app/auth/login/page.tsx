@@ -13,6 +13,7 @@ import {
     CheckCircle, Google, Visibility, VisibilityOff,
 } from "@mui/icons-material";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 const C = {
@@ -22,6 +23,7 @@ const C = {
     ink: "#080F1E",
     text: "#F0EDE8",
     muted: "rgba(240,237,232,0.52)",
+    faint: "rgba(240,237,232,0.22)",
     border: "rgba(240,237,232,0.07)",
 };
 
@@ -34,9 +36,9 @@ const DEMO_ACCOUNTS = [
 // ─── Demo Mode Toggle ─────────────────────────────────────────────────────────
 function DemoModeSection({ onSelect }: { onSelect: (email: string) => void }) {
     return (
-        <Box sx={{ mt: 3, p: 2, borderRadius: "16px", background: `${C.gold}08`, border: `1px dashed ${C.gold}33` }}>
-            <Typography sx={{ color: C.gold, fontSize: 11, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", mb: 1.5, textAlign: "center" }}>
-                Developer Demo Mode
+        <Box sx={{ mt: 1.5, p: 2, borderRadius: "16px", background: `${C.gold}08`, border: `1px dashed ${C.gold}33` }}>
+            <Typography sx={{ color: C.gold, fontSize: 10, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.1em", mb: 1.5, textAlign: "center" }}>
+                Developer Demo Accounts
             </Typography>
             <Stack direction="row" spacing={1}>
                 {DEMO_ACCOUNTS.map(acc => (
@@ -51,7 +53,7 @@ function DemoModeSection({ onSelect }: { onSelect: (email: string) => void }) {
                         }}
                     >
                         <Avatar sx={{ width: 24, height: 24, fontSize: 10, mb: 0.5, background: C.gold }}>{acc.name[0]}</Avatar>
-                        <Typography sx={{ color: C.text, fontSize: 10, fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden" }}>{acc.name.split(" ")[0]}</Typography>
+                        <Typography sx={{ color: C.text, fontSize: 9, fontWeight: 600, whiteSpace: "nowrap" }}>{acc.name.split(" ")[0]}</Typography>
                     </Button>
                 ))}
             </Stack>
@@ -68,51 +70,47 @@ function LoginForm({
     onSuccess: () => void;
 }) {
     const { login, googleLogin } = useAuth();
+    const { success, error: toastError } = useToast();
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [showDemo, setShowDemo] = useState(false);
+    const [showSandbox, setShowSandbox] = useState(false);
+    const [guest, setGuest] = useState({ name: "", email: "" });
 
     const handleLogin = async () => {
-        if (!email || !password) return;
+        if (!email || !password) return setError("Please fill in both fields.");
         setLoading(true);
         setError("");
         try {
             await login(email, password);
+            success("Welcome back!");
             onSuccess();
         } catch (e: any) {
-            setError(e.message || "Invalid credentials. Please try again.");
+            setError(e.response?.data?.detail || "Invalid credentials.");
+            toastError("Login failed.");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleGoogle = async (e?: React.MouseEvent, demoEmail?: string) => {
-        if (e) e.preventDefault();
-        
+    const handleGuestAction = async (demoEmail?: string) => {
         setLoading(true);
         setError("");
-        
         try {
-            // Realistic "Redirecting" experience
-            if (!demoEmail) {
-                await new Promise(r => setTimeout(r, 1500));
-                setError("External Google OAuth requires SSL. Using Sandbox instead.");
-                setShowDemo(true);
-                return;
-            }
-
-            const acc = DEMO_ACCOUNTS.find(a => a.email === demoEmail);
+            const emailToUse = demoEmail || guest.email;
+            if (!emailToUse) throw new Error("Email is required.");
+            const acc = DEMO_ACCOUNTS.find(a => a.email === emailToUse);
             await googleLogin({
-                email: demoEmail,
-                name: acc?.name || "Google User",
-                image: `https://ui-avatars.com/api/?name=${acc?.name || "G"}&background=random`
+                email: emailToUse,
+                name: acc?.name || guest.name || emailToUse.split("@")[0],
+                image: `https://ui-avatars.com/api/?name=${acc?.name || guest.name || "G"}&background=random`
             });
+            success("Logged in successfully!");
             onSuccess();
         } catch (e: any) {
-            setError(e.message || "Google sign-in failed.");
+            setError(e.message || "Sign-in failed.");
         } finally {
             setLoading(false);
         }
@@ -129,56 +127,74 @@ function LoginForm({
                 </Box>
             )}
 
-            <Stack spacing={2.5}>
-                <TextField 
-                    fullWidth label="Email address" placeholder="name@example.com"
-                    value={email} onChange={e => setEmail(e.target.value)}
-                    InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
-                />
-                <Box>
-                    <TextField 
-                        fullWidth label="Password" 
-                        type={showPassword ? "text" : "password"} 
-                        placeholder="••••••••"
-                        value={password} onChange={e => setPassword(e.target.value)}
-                        InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
-                        InputProps={{
-                            endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton onClick={() => setShowPassword(!showPassword)} sx={{ color: C.faint }}>
-                                        {showPassword ? <VisibilityOff /> : <Visibility />}
-                                    </IconButton>
-                                </InputAdornment>
-                            )
-                        }}
-                        sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
-                    />
-                    <Typography sx={{ mt: 1, color: C.coral, fontSize: 12, textAlign: "right", cursor: "pointer", fontWeight: 600 }}>Forgot password?</Typography>
-                </Box>
+            {!showSandbox ? (
                 <Button 
-                    fullWidth variant="contained" onClick={handleLogin} disabled={loading}
-                    sx={{ p: 1.6, borderRadius: "14px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontWeight: 800, textTransform: "none", fontSize: 16, "&:hover": { transform: "translateY(-1px)", boxShadow: `0 8px 25px ${C.emerald}44` } }}
+                    fullWidth onClick={() => setShowSandbox(true)} disabled={loading}
+                    startIcon={<Google sx={{ color: C.coral }} />}
+                    sx={{ p: 1.5, borderRadius: "14px", border: `1px solid ${C.border}`, color: C.text, textTransform: "none", fontSize: 14, fontWeight: 600, "&:hover": { background: "rgba(240,237,232,0.05)", borderColor: C.muted } }}
                 >
-                    {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Sign in"}
+                    Continue with Google
                 </Button>
-            </Stack>
+            ) : (
+                <Box sx={{ p: 2.5, borderRadius: "20px", background: "rgba(240,237,232,0.03)", border: `1px solid ${C.emerald}33`, animation: "slideUp 0.3s ease" }}>
+                    <Typography sx={{ color: C.emerald, fontSize: 11, fontWeight: 900, mb: 2.5, textAlign: "center", textTransform: "uppercase", letterSpacing: "0.1em" }}>Google Sandbox Login</Typography>
+                    <Stack spacing={2}>
+                        <TextField fullWidth size="small" placeholder="Your Name" value={guest.name} onChange={e => setGuest(g => ({ ...g, name: e.target.value }))} sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px", background: "rgba(240,237,232,0.02)", color: "#fff", "& fieldset": { borderColor: C.border } } }} />
+                        <TextField fullWidth size="small" placeholder="Your real email (from your PC)" value={guest.email} onChange={e => setGuest(g => ({ ...g, email: e.target.value }))} sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px", background: "rgba(240,237,232,0.02)", color: "#fff", "& fieldset": { borderColor: C.border } } }} />
+                        <Button fullWidth variant="contained" disabled={loading} onClick={() => handleGuestAction()} sx={{ py: 1.2, background: C.emerald, color: "#fff", borderRadius: "10px", textTransform: "none", fontWeight: 700 }}>
+                            {loading ? "Signing in..." : "Sign in with my Email"}
+                        </Button>
+                        <DemoModeSection onSelect={(email) => handleGuestAction(email)} />
+                        <Button fullWidth onClick={() => setShowSandbox(false)} sx={{ color: C.muted, textTransform: "none", fontSize: 12 }}>Back to regular login</Button>
+                    </Stack>
+                </Box>
+            )}
 
-            <Box sx={{ mt: 3, position: "relative", textAlign: "center" }}>
-                <Divider sx={{ borderColor: C.border }}>
-                    <Typography sx={{ px: 2, fontSize: 12, color: C.faint, fontWeight: 700 }}>OR CONTINUE WITH</Typography>
-                </Divider>
-            </Box>
+            {!showSandbox && (
+                <>
+                    <Box sx={{ mt: 3, position: "relative", textAlign: "center" }}>
+                        <Divider sx={{ borderColor: C.border }}>
+                            <Typography sx={{ px: 2, fontSize: 11, color: C.faint, fontWeight: 700 }}>OR EMAIL/PASSWORD</Typography>
+                        </Divider>
+                    </Box>
 
-            <Button 
-                fullWidth onClick={handleGoogle} disabled={loading}
-                startIcon={<Google sx={{ color: C.coral }} />}
-                sx={{ mt: 3, p: 1.5, borderRadius: "14px", border: `1px solid ${C.border}`, color: C.text, textTransform: "none", fontSize: 14, fontWeight: 600, "&:hover": { background: "rgba(240,237,232,0.05)", borderColor: C.muted } }}
-            >
-                Google
-            </Button>
-
-            {showDemo && <DemoModeSection onSelect={(email) => handleGoogle(undefined, email)} />}
+                    <Stack spacing={2.5} mt={3}>
+                        <TextField 
+                            fullWidth label="Email address" placeholder="name@example.com"
+                            value={email} onChange={e => setEmail(e.target.value)}
+                            InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
+                            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
+                        />
+                        <Box>
+                            <TextField 
+                                fullWidth label="Password" 
+                                type={showPassword ? "text" : "password"} 
+                                placeholder="••••••••"
+                                value={password} onChange={e => setPassword(e.target.value)}
+                                InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
+                                onKeyDown={e => e.key === "Enter" && handleLogin()}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            <IconButton onClick={() => setShowPassword(!showPassword)} sx={{ color: C.faint }}>
+                                                {showPassword ? <VisibilityOff /> : <Visibility />}
+                                            </IconButton>
+                                        </InputAdornment>
+                                    )
+                                }}
+                                sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
+                            />
+                            <Typography sx={{ mt: 1, color: C.coral, fontSize: 12, textAlign: "right", cursor: "pointer", fontWeight: 600 }}>Forgot password?</Typography>
+                        </Box>
+                        <Button 
+                            fullWidth variant="contained" onClick={handleLogin} disabled={loading}
+                            sx={{ p: 1.6, borderRadius: "14px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontWeight: 800, textTransform: "none", fontSize: 16, "&:hover": { transform: "translateY(-1px)", boxShadow: `0 8px 25px ${C.emerald}44` } }}
+                        >
+                            {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Sign in"}
+                        </Button>
+                    </Stack>
+                </>
+            )}
 
             <Typography sx={{ mt: 4, textAlign: "center", color: C.muted, fontSize: 14 }}>
                 Don&apos;t have an account? <span onClick={onToggle} style={{ color: C.emerald, fontWeight: 700, cursor: "pointer" }}>Create one free</span>
@@ -190,48 +206,48 @@ function LoginForm({
 // ─── RegisterForm ─────────────────────────────────────────────────────────────
 function RegisterForm({ onToggle, onSuccess }: { onToggle: () => void; onSuccess: () => void }) {
     const { register, googleLogin } = useAuth();
+    const { success, error: toastError } = useToast();
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [location, setLocation] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [showDemo, setShowDemo] = useState(false);
+    const [showSandbox, setShowSandbox] = useState(false);
+    const [guest, setGuest] = useState({ name: "", email: "" });
 
     const handleRegister = async () => {
-        if (!name || !email || !password) return;
+        if (!name || !email || !password) return setError("Please fill in fields.");
         setLoading(true);
         setError("");
         try {
             await register({ name, email, password, location });
+            success("Account created successfully!");
             onSuccess();
         } catch (e: any) {
-            setError(e.message || "Registration failed.");
+            setError(e.response?.data?.detail || "Registration failed.");
+            toastError("Registration failed.");
         } finally {
             setLoading(false);
         }
     };
 
-    const handleGoogle = async (e?: React.MouseEvent, demoEmail?: string) => {
-        if (e) e.preventDefault();
+    const handleGuestAction = async (demoEmail?: string) => {
         setLoading(true);
         setError("");
         try {
-            if (!demoEmail) {
-                await new Promise(r => setTimeout(r, 1200));
-                setError("External Google OAuth requires SSL. Using Sandbox instead.");
-                setShowDemo(true);
-                return;
-            }
-            const acc = DEMO_ACCOUNTS.find(a => a.email === demoEmail);
+            const emailToUse = demoEmail || guest.email;
+            if (!emailToUse) throw new Error("Email is required.");
+            const acc = DEMO_ACCOUNTS.find(a => a.email === emailToUse);
             await googleLogin({
-                email: demoEmail,
-                name: acc?.name || "Google User",
-                image: `https://ui-avatars.com/api/?name=${acc?.name || "G"}&background=random`
+                email: emailToUse,
+                name: acc?.name || guest.name || emailToUse.split("@")[0],
+                image: `https://ui-avatars.com/api/?name=${acc?.name || guest.name || "G"}&background=random`
             });
+            success("Joined successfully!");
             onSuccess();
         } catch (e: any) {
-            setError(e.message || "Google registration failed.");
+            setError(e.message || "Sign-up failed.");
         } finally {
             setLoading(false);
         }
@@ -248,54 +264,71 @@ function RegisterForm({ onToggle, onSuccess }: { onToggle: () => void; onSuccess
                 </Box>
             )}
 
-            <Stack spacing={2}>
-                <TextField 
-                    fullWidth label="Full Name" placeholder="John Doe"
-                    value={name} onChange={e => setName(e.target.value)}
-                    InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
-                />
-                <TextField 
-                    fullWidth label="Email" placeholder="name@example.com"
-                    value={email} onChange={e => setEmail(e.target.value)}
-                    InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
-                />
-                <TextField 
-                    fullWidth label="Password" type="password" placeholder="••••••••"
-                    value={password} onChange={e => setPassword(e.target.value)}
-                    InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
-                />
-                <TextField 
-                    fullWidth label="Location" placeholder="Mathura, UP"
-                    value={location} onChange={e => setLocation(e.target.value)}
-                    InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
-                    sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
-                />
+            {!showSandbox ? (
                 <Button 
-                    fullWidth variant="contained" onClick={handleRegister} disabled={loading}
-                    sx={{ mt: 1, p: 1.6, borderRadius: "14px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontWeight: 800, textTransform: "none", fontSize: 16, "&:hover": { transform: "translateY(-1px)", boxShadow: `0 8px 25px ${C.emerald}44` } }}
+                    fullWidth onClick={() => setShowSandbox(true)} disabled={loading}
+                    startIcon={<Google sx={{ color: C.coral }} />}
+                    sx={{ p: 1.5, borderRadius: "14px", border: `1px solid ${C.border}`, color: C.text, textTransform: "none", fontSize: 14, fontWeight: 600, "&:hover": { background: "rgba(240,237,232,0.05)", borderColor: C.muted } }}
                 >
-                    {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Create account"}
+                    Sign up with Google
                 </Button>
-            </Stack>
+            ) : (
+                <Box sx={{ p: 2.5, borderRadius: "20px", background: "rgba(240,237,232,0.03)", border: `1px solid ${C.emerald}33`, animation: "slideUp 0.3s ease" }}>
+                    <Typography sx={{ color: C.emerald, fontSize: 11, fontWeight: 900, mb: 2.5, textAlign: "center", textTransform: "uppercase", letterSpacing: "0.1em" }}>Google Sandbox Signup</Typography>
+                    <Stack spacing={2}>
+                        <TextField fullWidth size="small" placeholder="Your Name" value={guest.name} onChange={e => setGuest(g => ({ ...g, name: e.target.value }))} sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px", background: "rgba(240,237,232,0.02)", color: "#fff", "& fieldset": { borderColor: C.border } } }} />
+                        <TextField fullWidth size="small" placeholder="Your real email (from your PC)" value={guest.email} onChange={e => setGuest(g => ({ ...g, email: e.target.value }))} sx={{ "& .MuiOutlinedInput-root": { borderRadius: "10px", background: "rgba(240,237,232,0.02)", color: "#fff", "& fieldset": { borderColor: C.border } } }} />
+                        <Button fullWidth variant="contained" disabled={loading} onClick={() => handleGuestAction()} sx={{ py: 1.2, background: C.emerald, color: "#fff", borderRadius: "10px", textTransform: "none", fontWeight: 700 }}>
+                            {loading ? "Joining..." : "Join with my Email"}
+                        </Button>
+                        <DemoModeSection onSelect={(email) => handleGuestAction(email)} />
+                        <Button fullWidth onClick={() => setShowSandbox(false)} sx={{ color: C.muted, textTransform: "none", fontSize: 12 }}>Back to regular signup</Button>
+                    </Stack>
+                </Box>
+            )}
 
-            <Box sx={{ mt: 3, position: "relative", textAlign: "center" }}>
-                <Divider sx={{ borderColor: C.border }}>
-                    <Typography sx={{ px: 2, fontSize: 12, color: C.faint, fontWeight: 700 }}>OR JOIN WITH</Typography>
-                </Divider>
-            </Box>
+            {!showSandbox && (
+                <>
+                    <Box sx={{ mt: 3, position: "relative", textAlign: "center" }}>
+                        <Divider sx={{ borderColor: C.border }}>
+                            <Typography sx={{ px: 2, fontSize: 11, color: C.faint, fontWeight: 700 }}>OR USE EMAIL</Typography>
+                        </Divider>
+                    </Box>
 
-            <Button 
-                fullWidth onClick={handleGoogle} disabled={loading}
-                startIcon={<Google sx={{ color: C.coral }} />}
-                sx={{ mt: 3, p: 1.5, borderRadius: "14px", border: `1px solid ${C.border}`, color: C.text, textTransform: "none", fontSize: 14, fontWeight: 600, "&:hover": { background: "rgba(240,237,232,0.05)", borderColor: C.muted } }}
-            >
-                Google
-            </Button>
-
-            {showDemo && <DemoModeSection onSelect={(email) => handleGoogle(undefined, email)} />}
+                    <Stack spacing={2} mt={3}>
+                        <TextField 
+                            fullWidth label="Full Name" placeholder="John Doe"
+                            value={name} onChange={e => setName(e.target.value)}
+                            InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
+                            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
+                        />
+                        <TextField 
+                            fullWidth label="Email" placeholder="name@example.com"
+                            value={email} onChange={e => setEmail(e.target.value)}
+                            InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
+                            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
+                        />
+                        <TextField 
+                            fullWidth label="Password" type="password" placeholder="••••••••"
+                            value={password} onChange={e => setPassword(e.target.value)}
+                            InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
+                            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
+                        />
+                        <TextField 
+                            fullWidth label="Location" placeholder="Mathura, UP"
+                            value={location} onChange={e => setLocation(e.target.value)}
+                            InputLabelProps={{ sx: { color: C.muted, fontSize: 14 } }}
+                            sx={{ "& .MuiOutlinedInput-root": { borderRadius: "12px", background: "rgba(240,237,232,0.03)", color: C.text, "& fieldset": { borderColor: C.border } } }}
+                        />
+                        <Button 
+                            fullWidth variant="contained" onClick={handleRegister} disabled={loading}
+                            sx={{ mt: 1, p: 1.6, borderRadius: "14px", background: `linear-gradient(135deg,${C.emerald},${C.coral})`, color: "#fff", fontWeight: 800, textTransform: "none", fontSize: 16, "&:hover": { transform: "translateY(-1px)", boxShadow: `0 8px 25px ${C.emerald}44` } }}
+                        >
+                            {loading ? <CircularProgress size={24} sx={{ color: "#fff" }} /> : "Create account"}
+                        </Button>
+                    </Stack>
+                </>
+            )}
 
             <Typography sx={{ mt: 4, textAlign: "center", color: C.muted, fontSize: 14 }}>
                 Already have an account? <span onClick={onToggle} style={{ color: C.emerald, fontWeight: 700, cursor: "pointer" }}>Sign in</span>
@@ -351,7 +384,7 @@ export default function LoginPage() {
                         </Grid>
 
                         {/* Right side (Forms) */}
-                        <Grid size={{ xs: 12, md: 7 }} sx={{ p: { xs: 3, md: 5 } }}>
+                        <Grid size={{ xs: 12, md: 7 }} sx={{ p: { xs: 4, md: 6 }, display: "flex", alignItems: "center", justifyContent: "center" }}>
                             {mode === "login" 
                                 ? <LoginForm onToggle={() => setMode("register")} onSuccess={() => router.push("/dashboard")} />
                                 : <RegisterForm onToggle={() => setMode("login")} onSuccess={() => router.push("/onboarding")} />
