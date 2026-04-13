@@ -83,21 +83,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(TOKEN_KEY, token);
             localStorage.setItem(USER_KEY, JSON.stringify(loggedIn));
             setUser(loggedIn);
+        } catch (err) {
+            throw err; // re-throw so login form can display the error
         } finally {
             setLoading(false);
         }
     };
 
     // ── Google Login ──────────────────────────────────────────────────────────
-    const googleLogin = async (credential: string) => {
+    const googleLogin = async (data: { email: string; name: string; image?: string }) => {
         setLoading(true);
         try {
-            const res = await authApi.googleLogin({ credential });
+            const res = await authApi.googleLogin(data);
             if (!res.success || !res.data) throw new Error(res.message ?? "Google login failed");
             const { user: loggedIn, token } = res.data as { user: User; token: string };
             localStorage.setItem(TOKEN_KEY, token);
             localStorage.setItem(USER_KEY, JSON.stringify(loggedIn));
             setUser(loggedIn);
+        } catch (err) {
+            throw err; // re-throw so login form can display the error
         } finally {
             setLoading(false);
         }
@@ -118,6 +122,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             localStorage.setItem(TOKEN_KEY, token);
             localStorage.setItem(USER_KEY, JSON.stringify(newUser));
             setUser(newUser);
+        } catch (err) {
+            throw err; // re-throw so register form can display the error
         } finally {
             setLoading(false);
         }
