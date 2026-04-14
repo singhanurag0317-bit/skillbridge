@@ -114,7 +114,7 @@ export default function ImpactPage() {
         { label: "Impact Score", value: stats?.impactScore || 0, icon: <EmojiEvents />, color: C.gold },
         { label: "People Helped", value: stats?.peopleHelped || 0, icon: <People />, color: C.coral },
         { label: "Hours Shared", value: stats?.hoursContributed || 0, icon: <AccessTime />, color: C.emerald },
-        { label: "Skills Shared", value: stats?.skillsShared || 0, icon: <Psychology />, color: C.coralLight },
+        { label: "Skills Shared", value: stats?.skillsShared || 0, icon: <Psychology />, color: C.emerald },
     ];
 
     const shownBadges = tab === 0 ? badges : tab === 1 ? badges.filter(b => b.earned) : badges.filter(b => !b.earned);

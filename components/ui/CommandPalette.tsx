@@ -16,7 +16,7 @@ const C = {
 
 const PAGES = [
     { label: "Dashboard",  href: "/dashboard",  icon: "📊", tag: "Page" },
-    { label: "Explore Skills", href: "/explore",href: "/explore", icon: "🔍", tag: "Page" },
+    { label: "Explore Skills", href: "/explore", icon: "🔍", tag: "Page" },
     { label: "Messages / Chat", href: "/chat",  icon: "💬", tag: "Page" },
     { label: "Impact & Leaderboard", href: "/impact", icon: "⚡", tag: "Page" },
     { label: "My Bookings", href: "/bookings",  icon: "📅", tag: "Page" },
