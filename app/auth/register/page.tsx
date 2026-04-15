@@ -72,7 +72,7 @@ function LeftPanel() {
                 Build <span style={{ background: `linear-gradient(90deg,${C.emerald},${C.coral})`, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Connections.</span>
             </Typography>
             <Typography sx={{ color: C.muted, fontSize: 16, lineHeight: 1.8, mb: 5 }}>
-                Join the largest hyperlocal skill-sharing network. Use what you know to learn what you don't.
+                Join the largest hyperlocal skill-sharing network. Use what you know to learn what you don&apos;t.
             </Typography>
 
             <Stack spacing={2.5}>
