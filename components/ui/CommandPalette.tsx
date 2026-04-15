@@ -1,7 +1,7 @@
 "use client";
 // components/ui/CommandPalette.tsx — Global Cmd+K / Ctrl+K search overlay
 
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import {
     Box, Dialog, InputBase, Stack, Typography, Chip,
@@ -47,16 +47,19 @@ export default function CommandPalette({ open, onClose }: Props) {
         return ALL.filter(i => i.label.toLowerCase().includes(q));
     }, [query]);
 
-    useEffect(() => { setSelected(0); }, [results]);
-    useEffect(() => { if (!open) setQuery(""); }, [open]);
+    const handleClose = () => {
+        setQuery("");
+        setSelected(0);
+        onClose();
+    };
 
-    const go = (href: string) => { router.push(href); onClose(); };
+    const go = (href: string) => { router.push(href); handleClose(); };
 
     const handleKey = (e: React.KeyboardEvent) => {
         if (e.key === "ArrowDown") { e.preventDefault(); setSelected(s => Math.min(s + 1, results.length - 1)); }
         if (e.key === "ArrowUp")   { e.preventDefault(); setSelected(s => Math.max(s - 1, 0)); }
         if (e.key === "Enter" && results[selected]) go(results[selected].href);
-        if (e.key === "Escape") onClose();
+        if (e.key === "Escape") handleClose();
     };
 
     const tagColor = (tag: string) => tag === "Skill" ? C.emerald : C.coral;
@@ -64,7 +67,7 @@ export default function CommandPalette({ open, onClose }: Props) {
     return (
         <Dialog
             open={open}
-            onClose={onClose}
+            onClose={handleClose}
             maxWidth="sm"
             fullWidth
             PaperProps={{
@@ -85,7 +88,10 @@ export default function CommandPalette({ open, onClose }: Props) {
                     fullWidth
                     placeholder="Search pages, skills, people…"
                     value={query}
-                    onChange={e => setQuery(e.target.value)}
+                    onChange={(e) => {
+                        setQuery(e.target.value);
+                        setSelected(0);
+                    }}
                     onKeyDown={handleKey}
                     sx={{ color: C.text, fontSize: 15, "& input::placeholder": { color: C.muted } }}
                 />

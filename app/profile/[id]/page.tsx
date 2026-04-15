@@ -172,7 +172,7 @@ export default function ProfilePage() {
                                         <Typography sx={{ fontSize: 12, color: C.faint }}>{r.time}</Typography>
                                     </Box>
                                 </Stack>
-                                <Typography sx={{ fontSize: 14, fontStyle: "italic" }}>"{r.comment}"</Typography>
+                                <Typography sx={{ fontSize: 14, fontStyle: "italic" }}>&ldquo;{r.comment}&rdquo;</Typography>
                             </Card>
                         ))}
                     </Stack>

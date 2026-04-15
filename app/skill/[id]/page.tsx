@@ -156,7 +156,7 @@ export default function SkillDetailPage() {
                                             <Stack direction="row" spacing={0.3}>{[1, 2, 3, 4, 5].map(s => <Star key={s} sx={{ fontSize: 12, color: s <= r.rating ? C.gold : C.faint }} />)}</Stack>
                                         </Box>
                                     </Stack>
-                                    <Typography sx={{ color: C.muted, fontSize: 14, fontStyle: "italic" }}>"{r.comment}"</Typography>
+                                    <Typography sx={{ color: C.muted, fontSize: 14, fontStyle: "italic" }}>&ldquo;{r.comment}&rdquo;</Typography>
                                 </Card>
                             ))}
                         </Stack>
