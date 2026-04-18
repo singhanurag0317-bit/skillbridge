@@ -17,52 +17,50 @@ export default function NeuralBackground() {
         if (!ctx) return;
 
         let animationFrameId: number;
-        let particles: Particle[] = [];
-        const particleCount = 60;
-        const maxDistance = 180;
-        const mouse = { x: -100, y: -100 };
-
-        class Particle {
+        type Particle = {
             x: number;
             y: number;
             vx: number;
             vy: number;
             size: number;
             color: string;
+        };
+        let particles: Particle[] = [];
+        const particleCount = 60;
+        const maxDistance = 180;
+        const mouse = { x: -100, y: -100 };
 
-            constructor() {
-                this.x = Math.random() * canvas!.width;
-                this.y = Math.random() * canvas!.height;
-                // Slow floating movement
-                this.vx = (Math.random() - 0.5) * 0.4;
-                this.vy = (Math.random() - 0.5) * 0.4;
-                this.size = Math.random() * 2 + 1;
-                this.color = Math.random() > 0.8 ? C.coral : C.emerald;
-            }
+        const createParticle = (): Particle => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            // Slow floating movement
+            vx: (Math.random() - 0.5) * 0.4,
+            vy: (Math.random() - 0.5) * 0.4,
+            size: Math.random() * 2 + 1,
+            color: Math.random() > 0.8 ? C.coral : C.emerald,
+        });
 
-            draw() {
-                if (!ctx) return;
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.color + "AA";
-                ctx.fill();
-            }
+        const drawParticle = (particle: Particle) => {
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fillStyle = particle.color + "AA";
+            ctx.fill();
+        };
 
-            update() {
-                this.x += this.vx;
-                this.y += this.vy;
+        const updateParticle = (particle: Particle) => {
+            particle.x += particle.vx;
+            particle.y += particle.vy;
 
-                if (this.x < 0 || this.x > canvas!.width) this.vx *= -1;
-                if (this.y < 0 || this.y > canvas!.height) this.vy *= -1;
-            }
-        }
+            if (particle.x < 0 || particle.x > canvas.width) particle.vx *= -1;
+            if (particle.y < 0 || particle.y > canvas.height) particle.vy *= -1;
+        };
 
         const init = () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
             particles = [];
             for (let i = 0; i < particleCount; i++) {
-                particles.push(new Particle());
+                particles.push(createParticle());
             }
         };
 
@@ -102,8 +100,8 @@ export default function NeuralBackground() {
         const animate = () => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             particles.forEach((p) => {
-                p.update();
-                p.draw();
+                updateParticle(p);
+                drawParticle(p);
             });
             connect();
             animationFrameId = requestAnimationFrame(animate);

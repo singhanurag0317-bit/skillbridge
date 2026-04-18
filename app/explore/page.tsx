@@ -11,10 +11,11 @@ import {
 } from "@mui/material";
 import {
     Search, LocationOn, Star, People, AccessTime,
-    FilterList, GridView, Map, Close,
+    FilterList, GridView, Map as MapIcon, Close,
     ArrowForward, FiberManualRecord, Psychology,
-    TuneRounded, MyLocation,
+    TuneRounded, MyLocation, GridViewRounded,
 } from "@mui/icons-material";
+import MockMap from "@/components/ui/MockMap";
 
 // ─── Color tokens ─────────────────────────────────────────────────────────────
 const C = {
@@ -233,6 +234,7 @@ export default function ExplorePage() {
     const [minRating, setMinRating] = useState(0);
     const [onlyAvailable, setOnlyAvailable] = useState(false);
     const [showFilters, setShowFilters] = useState(true);
+    const [viewMode, setViewMode] = useState<'grid' | 'map'>('grid');
 
     const fetchSkills = useCallback(async () => {
         setLoading(true);
@@ -302,15 +304,42 @@ export default function ExplorePage() {
                             <Typography sx={{ color: C.muted, fontSize: 15 }}>
                                 Found <strong style={{ color: C.text }}>{skills.length}</strong> skills
                             </Typography>
-                            <IconButton onClick={() => setShowFilters(!showFilters)} sx={{ color: C.muted }}>
-                                <FilterList />
-                            </IconButton>
-                        </Stack>
+                                <IconButton onClick={() => setShowFilters(!showFilters)} sx={{ color: C.muted }}>
+                                    <FilterList />
+                                </IconButton>
+                                <Divider orientation="vertical" flexItem sx={{ mx: 1.5, borderColor: C.border, height: 24, alignSelf: 'center' }} />
+                                <Stack direction="row" sx={{ p: 0.5, background: 'rgba(240,237,232,0.05)', borderRadius: '10px' }}>
+                                    <IconButton 
+                                        onClick={() => setViewMode('grid')}
+                                        size="small"
+                                        sx={{ 
+                                            color: viewMode === 'grid' ? C.emerald : C.faint,
+                                            background: viewMode === 'grid' ? 'rgba(16,185,129,0.1)' : 'transparent',
+                                            borderRadius: '8px'
+                                        }}
+                                    >
+                                        <GridViewRounded sx={{ fontSize: 18 }} />
+                                    </IconButton>
+                                    <IconButton 
+                                        onClick={() => setViewMode('map')}
+                                        size="small"
+                                        sx={{ 
+                                            color: viewMode === 'map' ? C.emerald : C.faint,
+                                            background: viewMode === 'map' ? 'rgba(16,185,129,0.1)' : 'transparent',
+                                            borderRadius: '8px'
+                                        }}
+                                    >
+                                        <MapIcon sx={{ fontSize: 18 }} />
+                                    </IconButton>
+                                </Stack>
+                            </Stack>
 
                         {loading ? (
                             <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
                                 <CircularProgress sx={{ color: C.emerald }} />
                             </Box>
+                        ) : viewMode === 'map' ? (
+                            <MockMap skills={skills} onSkillClick={(s) => window.location.href = `/skill/${s.id}`} />
                         ) : skills.length > 0 ? (
                             <Grid container spacing={3}>
                                 {skills.map((skill, i) => (
