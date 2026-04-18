@@ -77,8 +77,9 @@ export default function SkillDetailPage() {
     );
 
     const provider = skill.user || {};
-    const initials = provider.initials || provider.name?.[0] || "?";
-    const color = C.emerald; // Default color
+    const initials = provider.initials || 
+        (provider.name ? provider.name.split(" ").map((n: string) => n[0]).join("").toUpperCase().slice(0, 2) : "?");
+    const color = skill.color || C.emerald;
 
     return (
         <Box sx={{ background: "transparent", minHeight: "100vh", color: C.text }}>
@@ -134,13 +135,27 @@ export default function SkillDetailPage() {
                         <Card sx={{ background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`, borderRadius: "20px", p: 3, mb: 4 }}>
                             <Typography sx={{ fontWeight: 700, fontSize: 20, mb: 2 }}>Availability</Typography>
                             <Grid container spacing={1}>
-                                {skill.availability?.map((slot: string) => (
-                                    <Grid size={{ xs: 6, sm: 4 }} key={slot}>
-                                        <Box onClick={() => setSelectedSlot(slot)} sx={{ p: 1.5, borderRadius: "10px", border: `1px solid ${selectedSlot === slot ? C.emerald : C.border}`, cursor: "pointer", background: selectedSlot === slot ? `${C.emerald}18` : "transparent", textAlign: "center" }}>
-                                            <Typography sx={{ fontSize: 13, color: selectedSlot === slot ? C.emerald : C.muted }}>{slot}</Typography>
-                                        </Box>
-                                    </Grid>
-                                ))}
+                                {skill.availability?.map((slotObj: any, idx: number) => {
+                                    const slotLabel = `${slotObj.day}: ${slotObj.slots?.[0] || 'Anytime'}`;
+                                    const isSelected = selectedSlot === slotLabel;
+                                    return (
+                                        <Grid size={{ xs: 6, sm: 4 }} key={`${slotObj.day}-${idx}`}>
+                                            <Box 
+                                                onClick={() => setSelectedSlot(slotLabel)} 
+                                                sx={{ 
+                                                    p: 1.5, borderRadius: "10px", 
+                                                    border: `1px solid ${isSelected ? C.emerald : C.border}`, 
+                                                    cursor: "pointer", 
+                                                    background: isSelected ? `${C.emerald}18` : "transparent", 
+                                                    textAlign: "center" 
+                                                }}
+                                            >
+                                                <Typography sx={{ fontWeight: 700, fontSize: 13, color: isSelected ? C.emerald : C.text }}>{slotObj.day}</Typography>
+                                                <Typography sx={{ fontSize: 11, color: isSelected ? C.emerald : C.muted }}>{slotObj.slots?.[0] || "Flexible"}</Typography>
+                                            </Box>
+                                        </Grid>
+                                    );
+                                })}
                             </Grid>
                         </Card>
 
@@ -168,8 +183,15 @@ export default function SkillDetailPage() {
                             <Stack direction="row" spacing={2} mb={2}>
                                 <Avatar sx={{ width: 48, height: 48, background: `linear-gradient(135deg,${C.emerald},${C.coral})` }}>{initials}</Avatar>
                                 <Box>
-                                    <Typography sx={{ fontWeight: 700 }}>{provider.name}</Typography>
-                                    <Typography sx={{ fontSize: 12, color: C.muted }}>{provider.city}</Typography>
+                                    <Stack direction="row" alignItems="center" spacing={0.5}>
+                                        <Typography sx={{ fontWeight: 700 }}>{provider.name}</Typography>
+                                        {provider.verified && <CheckCircle sx={{ color: C.emerald, fontSize: 16 }} />}
+                                    </Stack>
+                                    <Stack direction="row" alignItems="center" spacing={1}>
+                                        <Typography sx={{ fontSize: 12, color: C.muted }}>{provider.city}</Typography>
+                                        <FiberManualRecord sx={{ fontSize: 4, color: C.faint }} />
+                                        <Typography sx={{ fontSize: 12, color: C.gold, fontWeight: 700 }}>{provider.impactScore} pts</Typography>
+                                    </Stack>
                                 </Box>
                             </Stack>
                             <Typography sx={{ fontSize: 13, color: C.muted, mb: 3 }}>{provider.bio || "No bio provided."}</Typography>
