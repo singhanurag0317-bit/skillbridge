@@ -15,33 +15,20 @@ from sqlalchemy.orm import Session
 from database import get_db
 import models
 
-SECRET_KEY = os.getenv("SECRET_KEY", "skillbridge-super-secret-key-change-in-prod")
+SUPABASE_JWT_SECRET = os.getenv("SUPABASE_JWT_SECRET", "skillbridge-super-secret-key-change-in-prod")
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7  # 7 days
 
 bearer_scheme = HTTPBearer(auto_error=False)
 
 
-def hash_password(password: str) -> str:
-    salt = bcrypt.gensalt()
-    return bcrypt.hashpw(password.encode("utf-8"), salt).decode("utf-8")
-
-
-def verify_password(plain: str, hashed: str) -> bool:
-    return bcrypt.checkpw(plain.encode("utf-8"), hashed.encode("utf-8"))
-
-
-def create_access_token(user_id: str) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    payload = {"sub": user_id, "exp": expire}
-    return jwt.encode(payload, SECRET_KEY, algorithm=ALGORITHM)
-
-
-def decode_token(token: str) -> Optional[str]:
+def decode_token(token: str) -> Optional[dict]:
+    """Decodes a Supabase JWT and returns the payload (including 'sub' and 'email')."""
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        return payload.get("sub")
-    except JWTError:
+        # Supabase uses HS256 with the JWT Secret for the API
+        payload = jwt.decode(token, SUPABASE_JWT_SECRET, algorithms=[ALGORITHM], options={"verify_aud": False})
+        return payload
+    except JWTError as e:
+        print(f"JWT Decode Error: {e}")
         return None
 
 
@@ -52,13 +39,40 @@ def get_current_user(
     if not credentials:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Not authenticated")
 
-    user_id = decode_token(credentials.credentials)
-    if not user_id:
+    payload = decode_token(credentials.credentials)
+    if not payload or "sub" not in payload:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid or expired token")
 
+    user_id = payload["sub"]
     user = db.query(models.User).filter(models.User.id == user_id).first()
+    
+    # ─── Lazy synchronization: Create user if they don't exist in our DB ──────
     if not user:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        # Extract metadata from Supabase token
+        email = payload.get("email")
+        # Supabase stores extra data in user_metadata
+        metadata = payload.get("user_metadata", {})
+        name = metadata.get("full_name") or metadata.get("name") or email.split("@")[0]
+        location = metadata.get("location") or ""
+        
+        user = models.User(
+            id=user_id,
+            email=email,
+            name=name,
+            location=location,
+            password_hash="supabase_managed", # password is managed by Supabase
+        )
+        db.add(user)
+        try:
+            db.commit()
+            db.refresh(user)
+        except Exception as e:
+            db.rollback()
+            print(f"Failed to sync user: {e}")
+            # Try finding again in case of race condition
+            user = db.query(models.User).filter(models.User.id == user_id).first()
+            if not user:
+                raise HTTPException(status_code=500, detail="User sync failed")
 
     return user
 
