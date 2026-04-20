@@ -1,15 +1,15 @@
 {
-  "version": 2,
-  "framework": "nextjs",
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
+    "version": 2,
+    "framework": "nextjs",
+    "rewrites": [
+          {
+                  "source": "/api/(.*)",
+                  "destination": "/api/index.py"
+          }
+    ],
+    "functions": {
+          "api/index.py": {
+                  "runtime": "@vercel/python@0.2.1"
+          }
     }
-  ],
-  "functions": {
-    "api/index.py": {
-      "runtime": "@vercel/python"@.2.1
-    }
-  }
 }
