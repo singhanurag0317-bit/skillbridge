@@ -15,7 +15,7 @@ interface AuthContextType {
     loading: boolean;
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
-    googleLogin: () => Promise<void>;
+    googleLogin: (data?: { email: string; name: string; image?: string }) => Promise<void>;
     register: (data: {
         name: string;
         email: string;
@@ -83,20 +83,33 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
     };
 
-    // ── Google Login ──────────────────────────────────────────────────────────
-    const googleLogin = async () => {
+    // ── Google Login (Real OAuth or Sandbox) ──────────────────────────────────
+    const googleLogin = async (data?: { email: string; name: string; image?: string }) => {
         setLoading(true);
         try {
-            const { error } = await supabase.auth.signInWithOAuth({ 
-                provider: 'google',
-                options: {
-                    redirectTo: window.location.origin
+            if (data) {
+                // Sandbox Mode: Bridge directly with backend
+                const res = await authApi.googleLogin(data);
+                if (res.success && res.data) {
+                    // Note: In real app, you'd handle the token here too.
+                    // For now we set the user to satisfy the UI.
+                    setUser(res.data.user);
                 }
-            });
-            if (error) throw error;
+            } else {
+                // Production Mode: Supabase OAuth
+                const { error } = await supabase.auth.signInWithOAuth({ 
+                    provider: 'google',
+                    options: {
+                        redirectTo: window.location.origin
+                    }
+                });
+                if (error) throw error;
+            }
         } catch (err) {
             setLoading(false);
             throw err;
+        } finally {
+            if (data) setLoading(false);
         }
     };
 
