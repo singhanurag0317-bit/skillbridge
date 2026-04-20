@@ -24,66 +24,19 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/register")
 def register(body: schemas.RegisterRequest, db: Session = Depends(get_db)):
-    # Check duplicate email
-    existing = db.query(models.User).filter(models.User.email == body.email).first()
-    if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
-
-    user = models.User(
-        id=auth_utils.generate_id(),
-        name=body.name,
-        email=body.email,
-        password_hash=auth_utils.hash_password(body.password),
-        location=body.location,
-        city=body.location.split(",")[-1].strip() if "," in body.location else body.location,
-        level="Seed",
-        next_level="Sprout",
-        level_progress=0,
-        impact_score=0,
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-
-    total = db.query(models.User).count()
-    user_out = schemas.UserOut.from_orm_user(user, total)
-    token = auth_utils.create_access_token(user.id)
-
-    return schemas.ok({"user": user_out.model_dump(), "token": token}, "Registered successfully")
-
-
-@router.post("/login")
-def login(body: schemas.LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(models.User).filter(models.User.email == body.email).first()
-    if not user or not auth_utils.verify_password(body.password, user.password_hash):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-
-    total = db.query(models.User).count()
-    user_out = schemas.UserOut.from_orm_user(user, total)
-    token = auth_utils.create_access_token(user.id)
-
-    return schemas.ok({"user": user_out.model_dump(), "token": token}, "Login successful")
-
-
-@router.post("/google")
-def google_login(body: GoogleLoginRequest, db: Session = Depends(get_db)):
     """
-    Accept Google-authenticated user profile from the frontend.
-    Upsert the user: create if first login, update avatar if changed.
+    Sync endpoint called by frontend after Supabase registration.
+    Ensures user exists in local DB.
     """
-    if not body.email:
-        raise HTTPException(status_code=400, detail="Email is required for Google login")
-
     user = db.query(models.User).filter(models.User.email == body.email).first()
-
     if not user:
-        # ── Auto-create Google user ───────────────────────────────────────────
         user = models.User(
-            id=auth_utils.generate_id(),
-            name=body.name or body.email.split("@")[0],
+            id=body.email, # Temporary fallback, ideally uses Supabase ID if passed
+            name=body.name,
             email=body.email,
-            password_hash=auth_utils.hash_password(auth_utils.generate_id()),  # Random unguessable pwd
-            avatar=body.image or None,
+            password_hash="supabase_managed",
+            location=body.location,
+            city=body.location.split(",")[-1].strip() if "," in body.location else body.location,
             level="Seed",
             next_level="Sprout",
             level_progress=0,
@@ -92,18 +45,10 @@ def google_login(body: GoogleLoginRequest, db: Session = Depends(get_db)):
         db.add(user)
         db.commit()
         db.refresh(user)
-    else:
-        # ── Update avatar if provided and not already set ─────────────────────
-        if body.image and not user.avatar:
-            user.avatar = body.image
-            db.commit()
-            db.refresh(user)
 
     total = db.query(models.User).count()
-    user_out = schemas.UserOut.from_orm_user(user, total)
-    token = auth_utils.create_access_token(user.id)
+    return schemas.ok(schemas.UserOut.from_orm_user(user, total).model_dump(), "User synced")
 
-    return schemas.ok({"user": user_out.model_dump(), "token": token}, "Logged in with Google")
 
 
 

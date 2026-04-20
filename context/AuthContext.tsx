@@ -8,13 +8,14 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { User } from "@/types";
 import { authApi } from "@/lib/api";
+import { supabase } from "@/lib/supabase";
 
 interface AuthContextType {
     user: User | null;
     loading: boolean;
     isAuthenticated: boolean;
     login: (email: string, password: string) => Promise<void>;
-    googleLogin: (data: { email: string; name: string; image?: string }) => Promise<void>;
+    googleLogin: () => Promise<void>;
     register: (data: {
         name: string;
         email: string;
@@ -27,72 +28,75 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const TOKEN_KEY = "sb_token";
-const USER_KEY = "sb_user";
-
 export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
 
-    // ── Restore session on mount ──────────────────────────────────────────────
+    // ── Restore session and listen for changes ────────────────────────────────
     useEffect(() => {
-        const restoreSession = async () => {
-            const token = localStorage.getItem(TOKEN_KEY);
-            if (!token) {
-                setLoading(false);
-                return;
-            }
-            try {
-                const res = await authApi.getMe();
-                if (res.success && res.data) {
-                    setUser(res.data as User);
-                    localStorage.setItem(USER_KEY, JSON.stringify(res.data));
-                } else {
-                    // Token invalid — clear everything
-                    localStorage.removeItem(TOKEN_KEY);
-                    localStorage.removeItem(USER_KEY);
-                }
-            } catch {
-                localStorage.removeItem(TOKEN_KEY);
-                localStorage.removeItem(USER_KEY);
-            } finally {
+        const initSession = async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                await fetchUserData();
+            } else {
                 setLoading(false);
             }
         };
-        restoreSession();
+
+        initSession();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+            if (session) {
+                await fetchUserData();
+            } else {
+                setUser(null);
+                setLoading(false);
+            }
+        });
+
+        return () => subscription.unsubscribe();
     }, []);
 
-    // ── Login ─────────────────────────────────────────────────────────────────
-    const login = async (email: string, password: string) => {
-        setLoading(true);
+    const fetchUserData = async () => {
         try {
-            const res = await authApi.login({ email, password });
-            if (!res.success || !res.data) throw new Error(res.message ?? "Login failed");
-            const { user: loggedIn, token } = res.data as { user: User; token: string };
-            localStorage.setItem(TOKEN_KEY, token);
-            localStorage.setItem(USER_KEY, JSON.stringify(loggedIn));
-            setUser(loggedIn);
+            const res = await authApi.getMe();
+            if (res.success && res.data) {
+                setUser(res.data as User);
+            }
         } catch (err) {
-            throw err; // re-throw so login form can display the error
+            console.error("Failed to fetch user metadata:", err);
         } finally {
             setLoading(false);
         }
     };
 
-    // ── Google Login ──────────────────────────────────────────────────────────
-    const googleLogin = async (data: { email: string; name: string; image?: string }) => {
+    // ── Login ─────────────────────────────────────────────────────────────────
+    const login = async (email: string, password: string) => {
         setLoading(true);
         try {
-            const res = await authApi.googleLogin(data);
-            if (!res.success || !res.data) throw new Error(res.message ?? "Google login failed");
-            const { user: loggedIn, token } = res.data as { user: User; token: string };
-            localStorage.setItem(TOKEN_KEY, token);
-            localStorage.setItem(USER_KEY, JSON.stringify(loggedIn));
-            setUser(loggedIn);
-        } catch (err) {
-            throw err; // re-throw so login form can display the error
-        } finally {
+            const { error } = await supabase.auth.signInWithPassword({ email, password });
+            if (error) throw error;
+            // fetchUserData will be triggered by onAuthStateChange
+        } catch (err: any) {
             setLoading(false);
+            throw err;
+        }
+    };
+
+    // ── Google Login ──────────────────────────────────────────────────────────
+    const googleLogin = async () => {
+        setLoading(true);
+        try {
+            const { error } = await supabase.auth.signInWithOAuth({ 
+                provider: 'google',
+                options: {
+                    redirectTo: window.location.origin
+                }
+            });
+            if (error) throw error;
+        } catch (err) {
+            setLoading(false);
+            throw err;
         }
     };
 
@@ -105,24 +109,34 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }) => {
         setLoading(true);
         try {
-            const res = await authApi.register(data);
-            if (!res.success || !res.data) throw new Error(res.message ?? "Registration failed");
-            const { user: newUser, token } = res.data as { user: User; token: string };
-            localStorage.setItem(TOKEN_KEY, token);
-            localStorage.setItem(USER_KEY, JSON.stringify(newUser));
-            setUser(newUser);
-        } catch (err) {
-            throw err; // re-throw so register form can display the error
-        } finally {
+            const { data: authData, error } = await supabase.auth.signUp({
+                email: data.email,
+                password: data.password,
+                options: {
+                    data: {
+                        full_name: data.name,
+                        location: data.location,
+                    }
+                }
+            });
+            
+            if (error) throw error;
+            
+            // To bridge Supabase Auth with our Backend DB immediately, 
+            // we call our register endpoint which will now be updated to 
+            // "sync" the user if they don't exist.
+            await authApi.register(data);
+            
+        } catch (err: any) {
             setLoading(false);
+            throw err;
         }
     };
 
     // ── Logout ────────────────────────────────────────────────────────────────
-    const logout = () => {
+    const logout = async () => {
+        await supabase.auth.signOut();
         setUser(null);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(USER_KEY);
     };
 
     // ── Update user (e.g. after profile edit) ─────────────────────────────────
@@ -132,14 +146,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             const res = await authApi.updateProfile(data);
             if (res.success && res.data) {
                 setUser(res.data as User);
-                localStorage.setItem(USER_KEY, JSON.stringify(res.data));
             }
         } catch (err) {
             console.error("Failed to update user profile:", err);
-            // Fallback to local update if backend fails (not ideal but better than nothing)
             const updated = { ...user, ...data };
             setUser(updated);
-            localStorage.setItem(USER_KEY, JSON.stringify(updated));
         }
     };
 

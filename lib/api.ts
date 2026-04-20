@@ -12,6 +12,8 @@ import type {
     Message, ImpactStats, ApiResponse, SkillCategory,
 } from "@/types";
 
+import { supabase } from "./supabase";
+
 // ─── Axios instance ───────────────────────────────────────────────────────────
 const api = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000",
@@ -20,14 +22,16 @@ const api = axios.create({
 });
 
 // ─── Auth token injection ─────────────────────────────────────────────────────
-// Reads the JWT stored by AuthContext (sb_token) and attaches it to every request.
-api.interceptors.request.use((config) => {
-    if (typeof window !== "undefined") {
-        const token = localStorage.getItem("sb_token");
-        if (token) {
+// Reads the JWT from Supabase session and attaches it to every request.
+api.interceptors.request.use(async (config) => {
+    try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.access_token) {
             config.headers = config.headers ?? {};
-            config.headers.Authorization = `Bearer ${token}`;
+            config.headers.Authorization = `Bearer ${session.access_token}`;
         }
+    } catch (err) {
+        console.error("Error setting auth header:", err);
     }
     return config;
 });
