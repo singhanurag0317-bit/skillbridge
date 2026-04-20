@@ -2,12 +2,12 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import { useSearchParams } from "next/navigation";
 import Navbar from "@/components/layout/Navbar";
-import { messagesApi, usersApi } from "@/lib/api";
+import { messagesApi, usersApi, requestsApi } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
 import {
     Box, Button, Card, Stack,
     Typography, Avatar, IconButton, Divider, Badge,
-    TextField, InputAdornment, CircularProgress,
+    TextField, InputAdornment, CircularProgress, Chip,
 } from "@mui/material";
 import {
     Send, Search, MoreVert, Phone, VideoCall,
