@@ -119,17 +119,6 @@ export default function SkillDetailPage() {
 
                 <Grid container spacing={4}>
                     <Grid size={{ xs: 12, md: 8 }}>
-                        <Card sx={{ background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`, borderRadius: "20px", p: 3, mb: 3 }}>
-                            <Typography sx={{ fontWeight: 700, fontSize: 20, mb: 2 }}>About this skill</Typography>
-                            <Typography sx={{ color: C.muted, lineHeight: 1.8 }}>{skill.description}</Typography>
-                        </Card>
-                        
-                        {/* Tags */}
-                        <Stack direction="row" spacing={1} mb={4}>
-                            {skill.tags?.map((tag: any) => (
-                                <Chip key={tag} label={tag} size="small" sx={{ background: "rgba(240,237,232,0.06)", color: C.muted }} />
-                            ))}
-                        </Stack>
 
                         {/* Availability */}
                         <Card sx={{ background: "rgba(240,237,232,0.03)", border: `1px solid ${C.border}`, borderRadius: "20px", p: 3, mb: 4 }}>

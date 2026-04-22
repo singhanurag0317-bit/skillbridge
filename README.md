@@ -18,7 +18,7 @@ SkillBridge is a community-driven platform where people share skills with their 
 - **Hyperlocal** — Google Maps integration to find skill providers within walking distance
 - **Zero cost** — No money exchanges hands. Pure community value
 - **Impact tracking** — Personal impact score, leaderboard, badges and analytics
-- **Real-time chat** — Firebase-powered messaging with scheduling
+- **Real-time chat** — Supabase-powered messaging with scheduling
 - **Verified profiles** — Rating system, session history, community trust score
 
 ---
@@ -47,16 +47,16 @@ SkillBridge is a community-driven platform where people share skills with their 
 | TypeScript | Type safety |
 | Material UI (MUI) | Component library |
 | Axios | API calls |
-| Firebase Auth | User authentication |
+| Supabase Auth | User authentication |
 
-### Backend (teammates)
+### Backend (Unified Serverless)
 | Tool | Purpose |
 |---|---|
 | FastAPI (Python) | REST API |
-| Firestore | Database |
-| Firebase Auth | Auth verification |
+| Supabase (PostgreSQL) | Database |
+| Supabase Auth | Auth verification |
 | scikit-learn | AI matching algorithm |
-| Google Cloud Run | Deployment |
+| Vercel Serverless | Deployment |
 
 ---
 
@@ -65,7 +65,7 @@ SkillBridge is a community-driven platform where people share skills with their 
 ### Prerequisites
 - Node.js 18+
 - npm or yarn
-- A Firebase project (see setup below)
+- A Supabase project (see setup below)
 
 ### Installation
 
@@ -79,7 +79,7 @@ npm install
 
 # Set up environment variables
 cp .env.example .env.local
-# Fill in your Firebase config and API URL
+# Fill in your Supabase config and API URL
 
 # Run the development server
 npm run dev
@@ -94,14 +94,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 Create a `.env.local` file in the root directory:
 
 ```env
-NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_auth_domain
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_storage_bucket
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+SUPABASE_JWT_SECRET=your_jwt_secret
+DATABASE_URL=postgresql://postgres:pass@db.your-project.supabase.co:5432/postgres
 NEXT_PUBLIC_GOOGLE_MAPS_KEY=your_maps_key
-NEXT_PUBLIC_API_URL=http://localhost:8000
+NEXT_PUBLIC_API_URL=/api
 ```
 
 ---
@@ -128,7 +126,7 @@ skillbridge/
 │   └── ThemeRegistry.tsx       # MUI + Next.js SSR fix
 ├── lib/
 │   ├── api.ts                  # All Axios API calls
-│   └── firebase.ts             # Firebase config
+│   └── supabase.ts             # Supabase config
 └── types/
     └── index.ts                # TypeScript types
 ```
@@ -157,7 +155,7 @@ skillbridge/
 | Anurag Sharma | Frontend (Next.js + MUI) |
 | teammate 2 | Backend (FastAPI + Python) |
 | teammate 3 | ML Engineer (Matching algorithm) |
-| teammate 4 | Cloud + Database (Firebase + GCP) |
+| teammate 4 | Cloud + Database (Supabase + Vercel) |
 
 ---
 
