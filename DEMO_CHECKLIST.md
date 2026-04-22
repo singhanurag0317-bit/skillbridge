@@ -131,9 +131,6 @@ availability calendar, provider profile, and a slot picker to request a session.
 [Open impact] And finally — every session earns an impact score.
 We show leaderboards, badges, and analytics to keep people engaged.
 
-The whole frontend is production-ready. Our backend team has
-the FastAPI + Firebase + ML matching algorithm running on Google Cloud Run.
 
-SkillBridge turns unused knowledge into community capital — completely free."
 
 ─────────────────────────────────────────────────────────────────────────────
